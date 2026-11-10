@@ -1,2 +1,3 @@
 # 2026-11-10 到 2026-11-15 的版本动线。每一行对应一次真实提交。
 美术资产｜小精灵比例草图，先不进主线｜art/sketch｜assets/character/wool/walk.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜小精灵用黄块占位｜code/whitebox｜scripts/features/grappling_feature.gd｜已提交｜-｜只动脚本和场景结构。
