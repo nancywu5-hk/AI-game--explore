@@ -6,3 +6,4 @@
 代码资产｜钩爪可以甩到铆钉｜code/whitebox｜scripts/levels/enemy_spawner.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜普通铆钉用橙圈｜code/whitebox｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜加速铆钉用黄圈｜code/whitebox｜scenes/levels/level_1.tscn｜已提交｜-｜只动脚本和场景结构。
+美术资产｜启动画面接入｜art/sketch｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
