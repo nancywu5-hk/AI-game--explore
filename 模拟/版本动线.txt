@@ -103,3 +103,4 @@
 代码资产｜跳跃先接上｜code/whitebox｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜相机跟着方块走｜code/whitebox｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜钩爪可以甩到铆钉｜code/whitebox｜scripts/levels/enemy_spawner.gd｜已提交｜-｜只动脚本和场景结构。
+代码资产｜普通铆钉用橙圈｜code/whitebox｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
