@@ -295,3 +295,4 @@
 代码资产｜脱落铆钉用红圈｜code/whitebox｜scenes/characters/players/wool.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜老鹰按距离出生｜code/whitebox｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜保留白模启动参数｜code/whitebox｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
+代码资产｜按新切图改帧矩形｜code/whitebox｜project.godot｜已提交｜-｜只动脚本和场景结构。
