@@ -117,3 +117,4 @@
 代码资产｜普通铆钉用橙圈｜code/whitebox｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
 合并｜合并时发现同一文件被两边改过｜main｜scenes/levels/level_1.tscn｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
 美术资产｜启动画面接入｜art/sketch｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜老鹰按距离出生｜code/whitebox｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
