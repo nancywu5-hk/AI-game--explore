@@ -240,3 +240,4 @@
 代码资产｜脱落铆钉用红圈｜code/whitebox｜scenes/characters/players/wool.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜老鹰按距离出生｜code/whitebox｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 美术资产｜小精灵比例草图，先不进主线｜art/sketch｜assets/character/wool/walk.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜按新切图改帧矩形｜code/whitebox｜project.godot｜已提交｜-｜只动脚本和场景结构。
