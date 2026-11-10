@@ -115,3 +115,4 @@
 代码资产｜相机跟着方块走｜code/whitebox｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜钩爪可以甩到铆钉｜code/whitebox｜scripts/levels/enemy_spawner.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜普通铆钉用橙圈｜code/whitebox｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
+合并｜合并时发现同一文件被两边改过｜main｜scenes/levels/level_1.tscn｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
