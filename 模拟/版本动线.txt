@@ -321,3 +321,4 @@
 合并｜解冲突后合并进主线｜main｜scripts/characters/wool.gd｜已解决｜-｜冲突已经人工选边，主线只留一份。
 美术资产｜小精灵比例草图，先不进主线｜art/sketch｜assets/character/spucki/pflanze.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜跳跃先接上｜code/whitebox｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
+代码资产｜相机跟着方块走｜code/whitebox｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
