@@ -263,3 +263,4 @@
 合并｜解冲突后合并进主线｜main｜scenes/interactions/nail.tscn｜已解决｜-｜冲突已经人工选边，主线只留一份。
 代码资产｜保留白模启动参数｜code/whitebox｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜按新切图改帧矩形｜code/whitebox｜project.godot｜已提交｜-｜只动脚本和场景结构。
+代码资产｜搭白模地面｜code/whitebox｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
