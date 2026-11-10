@@ -176,3 +176,4 @@
 合并｜合并时发现同一文件被两边改过｜main｜scenes/characters/enemies/plant.tscn｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
 代码资产｜按新切图改帧矩形｜code/whitebox｜project.godot｜已提交｜-｜只动脚本和场景结构。
 代码资产｜搭白模地面｜code/whitebox｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
+美术资产｜启动画面接入｜art/sketch｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
