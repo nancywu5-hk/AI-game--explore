@@ -10,3 +10,4 @@
 代码资产｜老鹰按距离出生｜code/whitebox｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜保留白模启动参数｜code/whitebox｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
 美术资产｜小精灵比例草图，先不进主线｜art/sketch｜assets/map/nails/rusty-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜搭白模地面｜code/whitebox｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
