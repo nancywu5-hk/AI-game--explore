@@ -279,3 +279,4 @@
 美术资产｜启动画面接入｜art/sketch｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜相机跟着方块走｜code/whitebox｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜钩爪可以甩到铆钉｜code/whitebox｜scripts/levels/enemy_spawner.gd｜已提交｜-｜只动脚本和场景结构。
+合并｜合并为 白模版｜main｜scenes/levels/level_1.tscn｜已合并｜白模版｜合并后只有地面和小精灵，用来确认能跑。
