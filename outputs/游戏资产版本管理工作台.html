@@ -178,15 +178,19 @@ body.dark .bubble.human{background:#1d2740}
 <input id="upfile" type="file" hidden>
 <script>
 const NAV=[
+  {g:"管线",items:[
+    ["pipes","三条管线"],
+    ["role","角色"],
+    ["scene","场景"],
+    ["ui","界面"]
+  ]},
   {g:"协作",items:[
     ["room","联机房间"],
     ["crew","成员与模型"],
     ["board","交接与版本"]
   ]},
   {g:"资产",items:[
-    ["library","游戏资产"],
-    ["art","新上传的美术"],
-    ["audio","新上传的音效"]
+    ["library","全部资产"]
   ]},
   {g:"仓库",items:[
     ["commit","提交"]
@@ -255,22 +259,18 @@ const SPRINTS=[
   {id:"S144",title:"音效键与文件一一对应",ver:"scripts/globals/audio_manager.gd",st:"已验收",plan:"当前",body:"AudioManager 的键必须能找到 wav 或 mp3。缺文件的键不能算已登记。",checks:["wool_hook → assets/sound/wool/hook.wav","enemy_fish_start / enemy_fish_end 成对","背景乐是 assets/sound/game/background.mp3"]}
 ];
 const ROLES=[
-  {name:"Wool",id:"wool",kind:"主角 · 钩爪",rev:"scenes/characters/players/wool.tscn",script:"scripts/characters/wool.gd",anims:["idle","walk","jump","swing"],sheet:{idle:"assets/character/wool/idle.png",walk:"assets/character/wool/walk.png",jump:"assets/character/wool/jump.png",swing:"assets/character/wool/swing.png"}},
-  {name:"Eagle",id:"eagle",kind:"敌人 · 飞行",rev:"scenes/characters/enemies/eagle.tscn",script:"scripts/characters/eagle.gd",anims:["fly"],sheet:{fly:"assets/character/eagle/fly.png"}},
-  {name:"Fish",id:"fish",kind:"敌人 · 跃出",rev:"scenes/characters/enemies/fish.tscn",script:"scripts/characters/fish.gd",anims:["idle"],sheet:{idle:"assets/character/fish/fish.png"}},
-  {name:"Spucki",id:"plant",kind:"敌人 · 平台植物",rev:"scenes/characters/enemies/plant.tscn",script:"scripts/characters/plant.gd",anims:["idle"],sheet:{idle:"assets/character/spucki/pflanze.png"}}
+  {name:"羊毛人",id:"wool",kind:"操控角色",rev:"scenes/characters/players/wool.tscn",script:"scripts/characters/wool.gd",anims:["idle","walk","jump","swing"],sheet:{idle:"assets/character/wool/idle.png",walk:"assets/character/wool/walk.png",jump:"assets/character/wool/jump.png",swing:"assets/character/wool/swing.png"},sounds:["assets/sound/wool/hook.wav","assets/sound/wool/swing.wav","assets/sound/wool/die.wav"]},
+  {name:"鸟",id:"eagle",kind:"空中敌人",rev:"scenes/characters/enemies/eagle.tscn",script:"scripts/characters/eagle.gd",anims:["fly"],sheet:{fly:"assets/character/eagle/fly.png"},sounds:["assets/sound/enemies/bird.wav"]},
+  {name:"鱼",id:"fish",kind:"水面敌人",rev:"scenes/characters/enemies/fish.tscn",script:"scripts/characters/fish.gd",anims:["swim"],sheet:{swim:"assets/character/fish/fish.png"},sounds:["assets/sound/enemies/fish-start.wav","assets/sound/enemies/fish-end.wav"]}
 ];
 const SCENES=[
-  {name:"Level 1",id:"scenes/levels/level_1.tscn",tag:"主关",img:"assets/map/background.png",note:"project.godot 的 run/main_scene。脚本是 scripts/levels/level_1.gd。"},
-  {name:"平台与钉子",id:"scenes/interactions/nail.tscn",tag:"机关",img:"assets/map/platform.png",note:"普通钉、加速钉、生锈钉分开做。碰撞不跟贴图绑在同一张卡上。"},
-  {name:"击杀区",id:"scenes/terrain/kill_zone.tscn",tag:"地形",img:"assets/map/pin-red.png",note:"kill_zone.gd 只负责出界。不改 Wool 的跳跃参数。"}
+  {name:"背景",id:"assets/map/background.png",tag:"场景",files:["assets/map/background.png"],note:"关卡背景。替换后仍使用这个路径。"},
+  {name:"铆钉",id:"assets/map/nails",tag:"机关",files:["assets/map/nails/normal-front.png","assets/map/nails/normal-back.png","assets/map/nails/boost-front.png","assets/map/nails/boost-back.png","assets/map/nails/rusty-front.png","assets/map/nails/rusty-back.png","assets/map/nails/rusty-falloff.png"],note:"普通钉、加速钉、生锈钉。正面、背面分开替换。"}
 ];
 const UIASSETS=[
-  {name:"button",file:"assets/ui/button.png"},
-  {name:"pause-button",file:"assets/ui/pause-button.png"},
-  {name:"close-button",file:"assets/ui/close-button.png"},
-  {name:"logo",file:"assets/ui/logo.png"},
-  {name:"global_theme",file:"assets/ui/global_theme.tres"}
+  {name:"button 按钮",file:"assets/ui/button.png"},
+  {name:"pause-button 暂停",file:"assets/ui/pause-button.png"},
+  {name:"close-button 关闭",file:"assets/ui/close-button.png"}
 ];
 const CUES=[
   {name:"wool_hook",file:"assets/sound/wool/hook.wav"},
@@ -322,7 +322,7 @@ const CREW=[
   {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"核验模型",wake:"仅 @唤起"},
   {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"版控模型",wake:"仅 @唤起"}
 ];
-const state={view:"library",libFilter:"全部",libQ:"",libPick:"",files:[],replacePath:"",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"walk",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
+const state={view:"pipes",uiPick:0,sceneFile:0,libFilter:"全部",libQ:"",libPick:"",files:[],replacePath:"",tab:"当前",q:"",fst:"全部",role:0,scene:0,dir:"idle",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
   signed:false,artVer:2,repo:"等待签认",thinkOn:false,draft:"",waiting:false,focus:"美术",
   msgs:[
     {who:"制作人",kind:"human",text:"@PM 这轮只替换美术和音效。美术和场景可以同时看，版本 Agent 在我签认前不要提交。"},
@@ -354,10 +354,12 @@ function woolStage(){
   const spec=FRAMES[clipOf(state.dir)];
   return `<div class="stage"><canvas class="woolc" width="256" height="256"></canvas></div><div class="meta" id="frameno" style="text-align:center;margin-top:6px">${(state.woolFrame%spec.frames.length)+1} / ${spec.frames.length} · ${esc(currentSkin().name)}</div>`;
 }
+function assetUrl(rel){return "/games/Wool/"+rel}
+function thumbUrl(rel){return "/api/thumb?path="+encodeURIComponent("games/Wool/"+rel)}
+function shot(rel,alt){return `<img class="sprite" alt="${esc(alt||"")}" src="${thumbUrl(rel)}">`}
 function sprite(role,anim){
-  if(role.id==="wool") return woolStage();
   const file=(role.sheet&&role.sheet[anim])||Object.values(role.sheet||{})[0];
-  return `<img class="sprite" alt="${esc(role.name)}" src="${GAME.src}${file}">`;
+  return shot(file, role.name);
 }
 function viewSkin(){
   const skin=currentSkin();
@@ -396,43 +398,52 @@ function viewSprint(){
       <p>${esc(s.body)}</p><b>验收条件</b><ul>${s.checks.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></article>`).join("")||`<p class="lead">这一组没有卡片。</p>`}
     <p class="note">这些卡只保留在本地记录里，不连接外部项目。</p>`;
 }
+function viewPipes(){
+  const block=(title,lead,items)=>`<div class="card" style="padding:12px"><div class="meta">${title}</div><h2 style="margin:4px 0 10px">${lead}</h2>${items}</div>`;
+  const row=(go,idx,img,name,meta)=>`<button class="item" data-go="${go}" data-idx="${idx}" style="width:100%;text-align:left;display:flex;gap:10px;align-items:center"><img alt="" src="${thumbUrl(img)}" style="width:72px;height:72px;object-fit:contain;background:#1c2434;border-radius:10px"><span><b>${esc(name)}</b><div class="meta">${esc(meta)}</div></span></button>`;
+  return `<h1 class="h1">资产管线</h1><p class="lead">按角色、场景、界面三条管线管控。每条都能预览、走制作步骤、过四道闸门，再替换对应文件。</p>
+    <div class="split3">
+      ${block("01 角色", "羊毛人、鸟、鱼", ROLES.map((r,i)=>row("role",i,r.sheet[r.anims[0]],r.name,r.kind+" · "+r.anims.join(" / "))).join(""))}
+      ${block("02 场景", "背景、铆钉", SCENES.map((s,i)=>row("scene",i,s.files[0],s.name,s.files.length+" 个文件")).join(""))}
+      ${block("03 界面", "button 按钮", UIASSETS.map((u,i)=>row("ui",i,u.file,u.name,u.file)).join(""))}
+    </div>`;
+}
 function viewRole(){
-  const r=ROLES[state.role];
+  const r=ROLES[state.role]||ROLES[0];
   const anim=r.anims.includes(state.dir)?state.dir:r.anims[0];
+  const file=r.sheet[anim];
   const names=["场景","脚本","精灵表","动作名","音效键","装入关卡","运行确认"];
-  return `<div class="split"><div class="card list" style="padding:8px">${ROLES.map((x,i)=>`<button class="item ${i===state.role?"on":""}" data-r="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.script)}</div></button>`).join("")}</div>
-    <div><div class="card" style="padding:14px"><div class="row"><div class="grow"><div class="preview">${sprite(r,anim)}</div>
-      <div class="play"><span class="meta">${esc(anim)}</span><div class="bar"><i class="${state.playing?"run":""}"></i></div>
-        <button class="ghost" id="play">${state.playing?"暂停":"播放"}</button>
-        <select id="dir">${r.anims.map(d=>`<option ${anim===d?"selected":""}>${d}</option>`).join("")}</select></div></div>
-      <div style="flex:1 1 240px;max-width:320px"><div class="kv"><span>场景</span><b>${esc(r.rev)}</b><span>脚本</span><b>${esc(r.script)}</b><span>当前表</span><b>${esc(r.sheet[anim])}</b><span>许可</span><b>MIT</b></div>
-      <p class="note">图来自 games/Wool，不是另绘的候选。换动作只切换仓库里的文件。</p></div></div>
+  return `<div class="split"><div class="card list" style="padding:8px">${ROLES.map((x,i)=>`<button class="item ${i===state.role?"on":""}" data-r="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.kind)}</div></button>`).join("")}</div>
+    <div><div class="card" style="padding:14px"><div class="row"><div class="grow"><div class="preview">${shot(file,r.name)}</div>
+      <div class="play"><select id="dir">${r.anims.map(d=>`<option ${anim===d?"selected":""}>${d}</option>`).join("")}</select>
+        <button class="pri" id="replacegame" data-target="games/Wool/${file}">替换这张表</button></div></div>
+      <div style="flex:1 1 240px;max-width:340px"><div class="kv"><span>角色</span><b>${esc(r.name)}</b><span>场景</span><b>${esc(r.rev)}</b><span>脚本</span><b>${esc(r.script)}</b><span>当前表</span><b>${esc(file)}</b></div>
+      <p class="meta" style="margin-top:8px">音效 ${r.sounds.map(s=>esc(s.split("/").pop())).join(" · ")}</p></div></div>
       <h4>制作步骤</h4>${steps(names,2)}
-      <div class="row"><p class="grow">先对上场景、脚本和精灵表。Wool 的 jump 在 wool.gd 里被设成不循环。制作执行单只记录这三样的路径，不改文件。</p><button class="pri" id="run">制作执行单</button></div>
       <h4>本轮验收</h4>${gates()}
     </div></div></div>`;
 }
 function viewScene(){
-  const s=SCENES[state.scene];
+  const s=SCENES[state.scene]||SCENES[0];
+  const file=s.files[state.sceneFile]||s.files[0];
   const names=["功能与走查","白模定标","目标帧","四向细化","逐区与校验","图层与状态","照相机与结尾"];
-  return `<div class="split"><div class="card list" style="padding:8px">${SCENES.map((x,i)=>`<button class="item ${i===state.scene?"on":""}" data-s="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.id)} · ${esc(x.tag)}</div></button>`).join("")}</div>
-    <div class="card" style="padding:14px"><div class="row"><div class="preview grow" style="min-height:180px;background:#322"><img class="sprite" alt="${esc(s.name)}" src="${GAME.src}${s.img}"></div>
-      <div style="flex:1 1 240px;max-width:360px"><b>当前关卡文件</b><div class="kv" style="margin-top:8px"><span>场景</span><b>${esc(s.id)}</b><span>说明</span><b>${esc(s.note)}</b></div></div></div>
+  return `<div class="split"><div class="card list" style="padding:8px">${SCENES.map((x,i)=>`<button class="item ${i===state.scene?"on":""}" data-s="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${x.files.length} 个文件</div></button>`).join("")}</div>
+    <div class="card" style="padding:14px"><div class="row"><div class="preview grow">${shot(file,s.name)}</div>
+      <div style="flex:1 1 240px"><b>${esc(s.name)}</b><p class="note">${esc(s.note)}</p><p class="meta">${esc(file)}</p><button class="pri" id="replacegame" data-target="games/Wool/${file}">替换这张图</button></div></div>
+      <div class="agrid" style="margin-top:10px">${s.files.map((f,i)=>`<button class="acard ${f===file?"on":""}" data-sfile="${i}"><img alt="" src="${thumbUrl(f)}"><b>${esc(f.split("/").pop())}</b></button>`).join("")}</div>
       <h4>制作步骤</h4>${steps(names,1)}
-      <div class="row"><p class="grow">关卡、钉子和击杀区分开验收。贴图在 assets/map，场景在 scenes。改碰撞要单独开卡。</p><button class="pri" id="run">制作执行单</button></div>
       <h4>本轮验收</h4>${gates()}
-      <p class="note">仓库里有 28 个 .tscn。主场景只有 level_1。</p>
     </div></div>`;
 }
 function viewUI(){
-  const comps=UIASSETS;
-  const cur=comps[3];
-  return `<div class="split"><div class="card list" style="padding:8px">${comps.map((c,i)=>`<div class="item ${i===3?"on":""}"><b>${esc(c.name)}</b><div class="meta">${esc(c.file)}</div></div>`).join("")}</div>
-    <div class="card" style="padding:14px"><div class="preview" style="background:#243044"><img class="sprite" alt="${esc(cur.name)}" src="${GAME.src}${cur.file}"></div>
-      <p class="meta">res://${cur.file} · 主题 res://assets/ui/global_theme.tres</p>
+  const cur=UIASSETS[state.uiPick]||UIASSETS[0];
+  return `<div class="split"><div class="card list" style="padding:8px">${UIASSETS.map((c,i)=>`<button class="item ${i===state.uiPick?"on":""}" data-ui="${i}" style="width:100%;text-align:left"><b>${esc(c.name)}</b><div class="meta">${esc(c.file)}</div></button>`).join("")}</div>
+    <div class="card" style="padding:14px"><div class="preview">${shot(cur.file,cur.name)}</div>
+      <p class="meta">${esc(cur.file)}</p>
+      <button class="pri" id="replacegame" data-target="games/Wool/${cur.file}">替换这个按钮</button>
       <h4>制作步骤</h4>${steps(["宿主与语义","原生采样","组件与数据","源卡与画板","主题接入","尺寸与交互","视觉与确认"],0)}
-      <div class="row"><p class="grow">宿主实际宿主、组件目录与当前卡，问题复用时停。POSE 只在其明确范围内用。执行单锁定当前规格与 SHA。</p><button class="pri" id="run">制作执行单</button></div>
-      <h4>本轮核验</h4><div class="gates"><div class="gate"><b>技术 / 源 QA</b>稿、主题、配色、源 SHA 与比例，不只放文件存在。</div><div class="gate"><b>真实宿主</b>点击命中面、控件状态、尺寸、交互与真实样张效果。</div><div class="gate"><b>Agent 看图</b>同帧对比目标卡的角色、文字、描边和间隙。</div><div class="gate"><b>用户签认</b>原作者事实记录。</div></div></div></div>`;
+      <h4>本轮核验</h4>${gates()}
+    </div></div>`;
 }
 function viewAudio(){
   const cues=CUES;
@@ -621,7 +632,7 @@ function viewBoard(){
       <div class="stat"><b>串行集成</b><p class="meta">签认、入库、提交按闸门来。没过线的候选停在房间里。</p></div>
     </div>`;
 }
-const views={library:viewLibrary,art:viewArt,audio:viewAudio,skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
+const views={pipes:viewPipes,library:viewLibrary,art:viewArt,audio:viewAudio,skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
 function bind(){
   const v=$("#view");
   v.onclick=e=>{
@@ -631,7 +642,18 @@ function bind(){
     if(t.dataset.clip){state.dir=t.dataset.clip;state.woolFrame=0;state.acc=0;render()}
     if(t.dataset.skin){state.skinId=t.dataset.skin;render()}
     if(t.id==="applyskin"){applySkin()}
-    if(t.dataset.s!=null){state.scene=+t.dataset.s;render()}
+    if(t.dataset.s!=null){state.scene=+t.dataset.s;state.sceneFile=0;render()}
+    if(t.dataset.sfile!=null){state.sceneFile=+t.dataset.sfile;render()}
+    if(t.dataset.ui!=null){state.uiPick=+t.dataset.ui;render()}
+    const go=t.closest&&t.closest("[data-go]");
+    if(go){
+      state.view=go.dataset.go;
+      const idx=go.dataset.idx!=null?+go.dataset.idx:null;
+      if(state.view==="role"&&idx!=null){state.role=idx;if(!ROLES[idx].anims.includes(state.dir))state.dir=ROLES[idx].anims[0]}
+      if(state.view==="scene"&&idx!=null){state.scene=idx;state.sceneFile=0}
+      if(state.view==="ui"&&idx!=null)state.uiPick=idx;
+      render();
+    }
     if(t.dataset.a!=null){state.audio=+t.dataset.a;state.aud=false;render()}
     if(t.dataset.q!=null){state.quest=+t.dataset.q;render()}
     if(t.dataset.qt){state.qtab=t.dataset.qt;render()}
@@ -667,7 +689,7 @@ function bind(){
     if(t.dataset.filter){state.libFilter=t.dataset.filter;render()}
     const card=t.closest&&t.closest("[data-lib]");
     if(card){state.libPick=card.dataset.lib;state.aud=false;render()}
-    if(t.id==="replacegame"){replaceGame(state.libPick)}
+    if(t.id==="replacegame"||(t.closest&&t.closest("#replacegame"))){const btn=t.id==="replacegame"?t:t.closest("#replacegame");replaceGame(btn.dataset.target||state.libPick)}
     if(t.dataset.upload){chooseUpload(t.dataset.upload,"")}
     if(t.dataset.replace){chooseUpload(t.dataset.kind,t.dataset.replace)}
     if(t.dataset.file!=null&&t.dataset.kind){
