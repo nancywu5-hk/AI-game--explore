@@ -574,3 +574,4 @@
 代码资产｜搭白模地面｜code/play｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜小精灵用黄块占位｜code/play｜scripts/features/grappling_feature.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜用行走表替换黄块｜art/blockout｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜相机跟着方块走｜code/play｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
