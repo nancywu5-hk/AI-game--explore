@@ -71,6 +71,11 @@ body.dark .pill.wait{background:#3a2d16;color:#f5b14a}
 body.dark .preview{background:linear-gradient(180deg,#242038,#1b2030)}
 .fig{width:120px;height:180px}
 .sprite{max-width:220px;max-height:200px;image-rendering:pixelated;object-fit:contain}
+.agrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px}
+.acard{border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:8px;text-align:left;cursor:pointer}
+.acard.on{border-color:var(--accent);background:var(--accent-soft)}
+.acard img,.acard .ph{width:100%;height:84px;object-fit:contain;background:#1c2434;border-radius:8px;display:grid;place-items:center;color:#fff}
+.acard b{display:block;margin-top:6px;font-size:12px;word-break:break-all}
 .sprite.run{animation:bob .55s ease-in-out infinite}
 .stage{width:260px;height:260px;display:grid;place-items:center;background:radial-gradient(circle at 50% 72%, #3d5270, #1c2434 72%);border-radius:16px}
 canvas.woolc{width:220px;height:220px;image-rendering:pixelated}
@@ -179,8 +184,9 @@ const NAV=[
     ["board","交接与版本"]
   ]},
   {g:"资产",items:[
-    ["art","美术资产"],
-    ["audio","音效资产"]
+    ["library","游戏资产"],
+    ["art","新上传的美术"],
+    ["audio","新上传的音效"]
   ]},
   {g:"仓库",items:[
     ["commit","提交"]
@@ -316,7 +322,7 @@ const CREW=[
   {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"核验模型",wake:"仅 @唤起"},
   {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"版控模型",wake:"仅 @唤起"}
 ];
-const state={view:"room",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"walk",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
+const state={view:"library",libFilter:"全部",libQ:"",libPick:"",files:[],replacePath:"",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"walk",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
   signed:false,artVer:2,repo:"等待签认",thinkOn:false,draft:"",waiting:false,focus:"美术",
   msgs:[
     {who:"制作人",kind:"human",text:"@PM 这轮只替换美术和音效。美术和场景可以同时看，版本 Agent 在我签认前不要提交。"},
@@ -331,7 +337,7 @@ function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");se
 function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
 function nav(){
   $("#nav").innerHTML=NAV.map(g=>`<div class="nav-g">${g.g}</div>`+g.items.map(([id,name])=>`<button data-v="${id}" class="${state.view===id?"on":""}">${name}</button>`).join("")).join("");
-  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.view=b.dataset.v;render();if(["room","art","audio","commit","board"].includes(state.view))loadRepo()};
+  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;const next=b.dataset.v;const enter=next!==state.view;state.view=next;render();if(["room","art","audio","commit","board","library"].includes(state.view))loadRepo();if(enter&&state.view==="library")loadLibrary()};
 }
 function steps(names,on=0){
   return `<div class="steps">${names.map((n,i)=>`<div class="step ${i===on?"on":""}"><b>0${i+1}</b>${n}</div>`).join("")}</div>`;
@@ -500,6 +506,23 @@ function assetView(kind){
       <div class="btnrow" style="margin-top:10px">${name?`<button class="ghost" data-replace="${esc(name)}" data-kind="${kind}">替换这个文件</button>`:""}${kind==="audio"&&name?`<button class="ghost" id="aud">${state.aud?"暂停":"试听"}</button>`:""}</div>
       <p class="note">美术接受 png、jpg、webp、gif。音效接受 wav、mp3、ogg。单个文件不超过 20MB。</p></div></div>`;
 }
+function sizeOf(n){if(n>1048576)return (n/1048576).toFixed(1)+" MB";if(n>1024)return Math.round(n/1024)+" KB";return n+" B"}
+function viewLibrary(){
+  const groups=["全部","角色","地图","界面","图标","音效","字体","其他"];
+  const q=(state.libQ||"").trim();
+  const files=(state.files||[]).filter(f=>(state.libFilter==="全部"||f.group===state.libFilter)&&(!q||(f.name+f.path).includes(q)));
+  const cur=files.find(f=>f.path===state.libPick)||files[0];
+  const preview=!cur?`<p class="note">这一组没有文件。</p>`:cur.kind==="image"
+    ?`<img class="sprite" alt="${esc(cur.name)}" src="/${cur.path}?v=${state.assetVer||0}">`
+    :cur.kind==="audio"
+    ?`<div style="text-align:center"><div style="font-size:28px;color:var(--accent)">♪</div><b>${esc(cur.name)}</b><audio id="clip" src="/${cur.path}?v=${state.assetVer||0}"></audio></div>`
+    :`<b>${esc(cur.name)}</b>`;
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">游戏资产</h1><p class="lead">这里是游戏里现有的图、声音和字体。点开一个，再替换，路径保持不变。</p></div></div>
+    <div class="tabs">${groups.map(g=>`<button data-filter="${g}" class="${state.libFilter===g?"on":""}">${g}</button>`).join("")}</div>
+    <div class="search"><input id="libq" placeholder="按文件名或路径找" value="${esc(state.libQ)}"></div>
+    <div class="split"><div><div class="agrid">${files.map(f=>`<button class="acard ${cur&&cur.path===f.path?"on":""}" data-lib="${esc(f.path)}">${f.kind==="image"?`<img alt="" src="/api/thumb?path=${encodeURIComponent(f.path)}">`:`<div class="ph">${f.kind==="audio"?"♪":"字"}</div>`}<b>${esc(f.name)}</b><div class="meta">${esc(f.group)} · ${sizeOf(f.bytes)}</div></button>`).join("")||`<p class="note">没有匹配的资产。</p>`}</div></div>
+    <div class="card" style="padding:14px">${cur?`<div class="preview">${preview}</div><p style="margin-top:10px"><b>${esc(cur.name)}</b></p><p class="meta">${esc(cur.path)}<br>${sizeOf(cur.bytes)}</p><div class="btnrow"><button class="pri" id="replacegame">替换这个文件</button>${cur.kind==="audio"?`<button class="ghost" id="aud">${state.aud?"暂停":"试听"}</button>`:""}</div><p class="note">替换后仍是这个路径。到提交页才会推进仓库。</p>`:`<p class="note">先从左边选一个资产。</p>`}</div></div>`;
+}
 function viewArt(){return assetView("art")}
 function viewAudio(){return assetView("audio")}
 function viewCommit(){
@@ -598,7 +621,7 @@ function viewBoard(){
       <div class="stat"><b>串行集成</b><p class="meta">签认、入库、提交按闸门来。没过线的候选停在房间里。</p></div>
     </div>`;
 }
-const views={art:viewArt,audio:viewAudio,skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
+const views={library:viewLibrary,art:viewArt,audio:viewAudio,skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
 function bind(){
   const v=$("#view");
   v.onclick=e=>{
@@ -641,6 +664,10 @@ function bind(){
       if(!state.signed){state.draft="@版本 提交本轮已签认的资产";sendRoom();return}
       state.view="commit";render();loadRepo();
     }
+    if(t.dataset.filter){state.libFilter=t.dataset.filter;render()}
+    const card=t.closest&&t.closest("[data-lib]");
+    if(card){state.libPick=card.dataset.lib;state.aud=false;render()}
+    if(t.id==="replacegame"){replaceGame(state.libPick)}
     if(t.dataset.upload){chooseUpload(t.dataset.upload,"")}
     if(t.dataset.replace){chooseUpload(t.dataset.kind,t.dataset.replace)}
     if(t.dataset.file!=null&&t.dataset.kind){
@@ -654,6 +681,7 @@ function bind(){
   const sq=$("#sq"); if(sq) sq.oninput=e=>{state.q=e.target.value;render();$("#sq").focus()};
   const sf=$("#sf"); if(sf) sf.onchange=e=>{state.fst=e.target.value;render()};
   const dir=$("#dir"); if(dir) dir.onchange=e=>{state.dir=e.target.value;state.woolFrame=0;state.acc=0;render()};
+  const lq=$("#libq"); if(lq) lq.oninput=e=>{state.libQ=e.target.value;render();const n=$("#libq");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}};
   const bq=$("#bq"); if(bq) bq.oninput=e=>{state.bookQ=e.target.value;render();$("#bq").focus()};
   const bd=$("#bd"); if(bd) bd.onchange=e=>{state.bookD=e.target.value;render()};
   const say=$("#say");
@@ -676,11 +704,32 @@ function render(){
   $("#log").classList.toggle("show",state.logOn);
 }
 function chooseUpload(kind,replaceName){
+  state.replacePath="";
   state.uploadKind=kind;
   state.replaceName=replaceName||"";
   const input=$("#upfile");
   input.accept=kind==="art"?".png,.jpg,.jpeg,.webp,.gif":".wav,.mp3,.ogg";
   input.click();
+}
+function replaceGame(path){
+  if(!path) return;
+  state.replacePath=path;
+  state.replaceName="";
+  const ext=path.split(".").pop().toLowerCase();
+  const input=$("#upfile");
+  input.accept="."+ext;
+  input.click();
+}
+async function loadLibrary(){
+  try{
+    const r=await fetch("/api/library");
+    const data=await r.json();
+    state.files=data.files||[];
+    if(!state.files.some(f=>f.path===state.libPick)) state.libPick=(state.files[0]||{}).path||"";
+  }catch(err){
+    state.files=[];
+  }
+  if(state.view==="library") render();
 }
 async function loadRepo(){
   try{
@@ -736,14 +785,19 @@ $("#upfile").onchange=async e=>{
   const file=e.target.files&&e.target.files[0];
   e.target.value="";
   if(!file) return;
+  const gamePath=state.replacePath;
   const name=state.replaceName||file.name;
   try{
-    const r=await fetch("/api/upload?kind="+encodeURIComponent(state.uploadKind)+"&name="+encodeURIComponent(name),{method:"POST",headers:{"Content-Type":"application/octet-stream"},body:file});
+    const r=gamePath
+      ? await fetch("/api/replace?path="+encodeURIComponent(gamePath),{method:"POST",headers:{"Content-Type":"application/octet-stream"},body:file})
+      : await fetch("/api/upload?kind="+encodeURIComponent(state.uploadKind)+"&name="+encodeURIComponent(name),{method:"POST",headers:{"Content-Type":"application/octet-stream"},body:file});
     const data=await r.json();
     if(!r.ok||!data.ok) throw new Error(data.error||"上传没有完成");
     state.assetVer=(state.assetVer||0)+1;
-    logs.unshift((state.replaceName?"替换 ":"上传 ")+data.file);
-    toast(state.replaceName?"已替换，去提交即可入库":"已上传，去提交即可入库");
+    state.replacePath="";
+    logs.unshift((gamePath||state.replaceName?"替换 ":"上传 ")+data.file);
+    toast("已替换，去提交即可入库");
+    if(gamePath) await loadLibrary();
     await loadRepo();
   }catch(err){
     toast(err.message||"上传没有完成");
@@ -751,6 +805,7 @@ $("#upfile").onchange=async e=>{
 };
 render();
 loadRepo();
+loadLibrary();
 </script>
 </body>
 </html>
