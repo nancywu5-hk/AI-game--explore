@@ -1,0 +1,134 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/username_prompt.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://rcr5v5hlcmya" path="res://scenes/ui/menu_background.tscn" id="2_menu_bg"]
+[ext_resource type="Theme" uid="uid://dfh80kxu23rvv" path="res://assets/ui/pause_theme.tres" id="3_theme"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_field"]
+content_margin_left = 28.0
+content_margin_top = 12.0
+content_margin_right = 28.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 0.98823529, 0.94901961, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.44, 0.41, 0.53, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_field_focus"]
+content_margin_left = 28.0
+content_margin_top = 12.0
+content_margin_right = 28.0
+content_margin_bottom = 12.0
+bg_color = Color(1, 1, 1, 1)
+border_width_left = 5
+border_width_top = 5
+border_width_right = 5
+border_width_bottom = 5
+border_color = Color(0.31, 0.27, 0.42, 1)
+corner_radius_top_left = 24
+corner_radius_top_right = 24
+corner_radius_bottom_right = 24
+corner_radius_bottom_left = 24
+
+[node name="UsernamePrompt" type="CanvasLayer"]
+process_mode = 3
+layer = 128
+script = ExtResource("1_script")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_theme")
+
+[node name="OuterMargin" type="MarginContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 150
+theme_override_constants/margin_top = 150
+theme_override_constants/margin_right = 150
+theme_override_constants/margin_bottom = 150
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/OuterMargin"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="MarginContainer" parent="Control/OuterMargin/CenterContainer"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 56
+theme_override_constants/margin_bottom = 48
+
+[node name="MenuBackground" parent="Control/OuterMargin/CenterContainer/Panel" instance=ExtResource("2_menu_bg")]
+layout_mode = 1
+
+[node name="ContentMargin" type="MarginContainer" parent="Control/OuterMargin/CenterContainer/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 40
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 24
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_font_sizes/font_size = 80
+text = "Wie heißt du?"
+horizontal_alignment = 1
+
+[node name="HintLabel" type="Label" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.35, 0.29, 0.22, 1)
+theme_override_font_sizes/font_size = 36
+text = "Dein Name auf der Bestenliste.
+Du kannst ihn jederzeit in den Einstellungen ändern."
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="NameEdit" type="LineEdit" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/VBoxContainer"]
+custom_minimum_size = Vector2(360, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_colors/font_placeholder_color = Color(0.2, 0.15, 0.1, 0.4)
+theme_override_colors/caret_color = Color(0.31, 0.27, 0.42, 1)
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxFlat_field")
+theme_override_styles/focus = SubResource("StyleBoxFlat_field_focus")
+placeholder_text = "Dein Name"
+alignment = 1
+max_length = 16
+caret_blink = true
+
+[node name="ConfirmButton" type="Button" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Los geht's"

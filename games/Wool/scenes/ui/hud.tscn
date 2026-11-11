@@ -1,0 +1,87 @@
+[gd_scene format=3 uid="uid://hud1234568aa"]
+
+[ext_resource type="Script" uid="uid://c8ed53ok2tpnj" path="res://scripts/ui/hud.gd" id="1_hud"]
+[ext_resource type="Texture2D" uid="uid://dp2k86loldjoo" path="res://assets/ui/pointer.png" id="2_hqnrr"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_pause"]
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_hqnrr"]
+load_path = "res://.godot/imported/pause-button.png-f7845fdaf014cf611fd08a79ca1d4cd3.ctex"
+
+[node name="HUD" type="CanvasLayer" unique_id=1156887095 groups=["hud"]]
+script = ExtResource("1_hud")
+
+[node name="HUDBackground" type="TextureRect" parent="." unique_id=1304519699]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+
+[node name="PauseButton" type="Button" parent="." unique_id=962890808]
+offset_left = 150.0
+offset_top = 100.0
+offset_right = 300.0
+offset_bottom = 250.0
+theme_override_font_sizes/font_size = 48
+theme_override_styles/normal = SubResource("StyleBoxEmpty_pause")
+theme_override_styles/pressed = SubResource("StyleBoxEmpty_pause")
+theme_override_styles/hover = SubResource("StyleBoxEmpty_pause")
+theme_override_styles/disabled = SubResource("StyleBoxEmpty_pause")
+theme_override_styles/focus = SubResource("StyleBoxEmpty_pause")
+icon = SubResource("CompressedTexture2D_hqnrr")
+flat = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="CurrentDistance" type="Label" parent="." unique_id=813363408]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -652.0
+offset_top = 104.0
+offset_right = -152.0
+offset_bottom = 248.0
+grow_horizontal = 0
+theme_override_font_sizes/font_size = 100
+text = "0m"
+horizontal_alignment = 2
+
+[node name="RustyNailTimer" type="Control" parent="." unique_id=784765479]
+clip_contents = true
+layout_mode = 3
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = -150.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Background" type="Panel" parent="RustyNailTimer" unique_id=1795244933]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="Fill" type="Panel" parent="RustyNailTimer" unique_id=531463416]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_right = 300.0
+
+[node name="OffScreenIndicator" type="TextureRect" parent="." unique_id=2131055129]
+visible = false
+offset_right = 180.0
+offset_bottom = 180.0
+pivot_offset = Vector2(90, 90)
+texture = ExtResource("2_hqnrr")
+expand_mode = 1
+stretch_mode = 5

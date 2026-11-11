@@ -1,0 +1,100 @@
+[gd_scene format=3 uid="uid://dys6tb5xur5kw"]
+
+[ext_resource type="PackedScene" uid="uid://b6ta6xfdcfr3h" path="res://scenes/characters/players/wool.tscn" id="2_wool"]
+[ext_resource type="Texture2D" uid="uid://cpts61gy6cmd7" path="res://assets/map/platform.png" id="3_dga24"]
+[ext_resource type="PackedScene" uid="uid://dyc68xp3u5p3y" path="res://scenes/interactions/nail.tscn" id="7_oc4kc"]
+[ext_resource type="Texture2D" uid="uid://t6qqb0gaucwp" path="res://assets/ui/logo.png" id="8_dga24"]
+[ext_resource type="PackedScene" uid="uid://cyd7fkfntvjrp" path="res://scenes/terrain/kill_zone.tscn" id="8_s8va5"]
+[ext_resource type="PackedScene" uid="uid://hud1234568aa" path="res://scenes/ui/hud.tscn" id="9_hud"]
+[ext_resource type="Script" uid="uid://bda7hptn4quii" path="res://scripts/world/level_generator.gd" id="10_gen"]
+[ext_resource type="Texture2D" uid="uid://c7cu5fm7dgrhd" path="res://assets/map/pin-blue.png" id="10_iav0o"]
+[ext_resource type="Texture2D" uid="uid://bnlwwrqooq2b" path="res://assets/map/pin-red.png" id="11_dnkej"]
+[ext_resource type="Script" uid="uid://b3hisekcg88jf" path="res://scripts/levels/level_1.gd" id="11_level1"]
+[ext_resource type="Script" uid="uid://cdelytkcd0lhe" path="res://scripts/world/background_generator.gd" id="12_bg_gen"]
+[ext_resource type="Texture2D" uid="uid://bglxrr10de6ud" path="res://assets/map/pin-yellow.png" id="12_mm8aj"]
+[ext_resource type="Script" uid="uid://bbgjdv6u0holg" path="res://scripts/environment/pin.gd" id="13_pin_script"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oc4kc"]
+size = Vector2(632, 224)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_excbq"]
+size = Vector2(240, 7184)
+
+[node name="level_1" type="Node2D" unique_id=1379504400]
+script = ExtResource("11_level1")
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="." unique_id=1532128638]
+
+[node name="ParallaxLayer" type="ParallaxLayer" parent="ParallaxBackground" unique_id=1133740099]
+
+[node name="BackgroundGenerator" type="Node2D" parent="." unique_id=1172917408]
+script = ExtResource("12_bg_gen")
+
+[node name="Platforms" type="Node2D" parent="." unique_id=558039656]
+
+[node name="StartPlatform" type="StaticBody2D" parent="Platforms" unique_id=62578216]
+
+[node name="platform" type="Sprite2D" parent="Platforms/StartPlatform" unique_id=813464752]
+modulate = Color(1.3, 1.3, 1.3, 1)
+position = Vector2(1130, -583)
+texture = ExtResource("3_dga24")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/StartPlatform" unique_id=2033956464]
+position = Vector2(182, -135)
+shape = SubResource("RectangleShape2D_oc4kc")
+
+[node name="Left Border" type="StaticBody2D" parent="Platforms" unique_id=554452192]
+position = Vector2(-312, -1184)
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/Left Border" unique_id=1669957186]
+position = Vector2(192, -2400)
+shape = SubResource("RectangleShape2D_excbq")
+
+[node name="logo" type="Sprite2D" parent="." unique_id=1993452516]
+z_index = -5
+position = Vector2(1266, -584)
+texture = ExtResource("8_dga24")
+
+[node name="Wool" parent="." unique_id=2003677760 instance=ExtResource("2_wool")]
+position = Vector2(194, -319)
+scale = Vector2(0.15, 0.15)
+
+[node name="KillZone" parent="." unique_id=1478754 instance=ExtResource("8_s8va5")]
+position = Vector2(0, 300)
+
+[node name="HUD" parent="." unique_id=514150144 instance=ExtResource("9_hud")]
+
+[node name="LevelGenerator" type="Node2D" parent="." unique_id=197143395]
+script = ExtResource("10_gen")
+
+[node name="Nails" type="Node" parent="." unique_id=425113253]
+
+[node name="Nail" parent="." unique_id=1540359132 instance=ExtResource("7_oc4kc")]
+position = Vector2(562, -735)
+
+[node name="Nail2" parent="." unique_id=474985519 instance=ExtResource("7_oc4kc")]
+position = Vector2(714, -463)
+
+[node name="pins" type="Node2D" parent="." unique_id=1553145124]
+
+[node name="blue" type="Sprite2D" parent="pins" unique_id=241030679]
+position = Vector2(514.00006, -207)
+rotation = -2.7080307
+scale = Vector2(0.5694561, 0.5694561)
+texture = ExtResource("10_iav0o")
+script = ExtResource("13_pin_script")
+
+[node name="red" type="Sprite2D" parent="pins" unique_id=762032881]
+position = Vector2(34, -287)
+rotation = 2.896886
+scale = Vector2(0.6418233, 0.6418233)
+texture = ExtResource("11_dnkej")
+script = ExtResource("13_pin_script")
+
+[node name="yellow" type="Sprite2D" parent="pins" unique_id=1000762797]
+position = Vector2(70, -126)
+rotation = -2.585028
+scale = Vector2(0.9072475, 0.9072475)
+texture = ExtResource("12_mm8aj")
+script = ExtResource("13_pin_script")

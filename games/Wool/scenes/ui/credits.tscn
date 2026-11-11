@@ -1,0 +1,151 @@
+[gd_scene format=3 uid="uid://bggd0jonndu75"]
+
+[ext_resource type="Script" uid="uid://bshgralvd6u5q" path="res://scripts/ui/credits.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://rcr5v5hlcmya" path="res://scenes/ui/menu_background.tscn" id="2_menu_bg"]
+[ext_resource type="FontFile" uid="uid://bj213cenwc7jk" path="res://assets/font/Outline-Style.ttf" id="3_pqmjv"]
+
+[node name="CreditsScreen" type="Control" unique_id=999885070]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_script")
+
+[node name="OuterMargin" type="MarginContainer" parent="." unique_id=175600002]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 150
+theme_override_constants/margin_top = 150
+theme_override_constants/margin_right = 150
+theme_override_constants/margin_bottom = 150
+
+[node name="CenterContainer" type="CenterContainer" parent="OuterMargin" unique_id=175600003]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="MarginContainer" parent="OuterMargin" unique_id=449491537]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+custom_minimum_size = Vector2(620, 0)
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 56
+theme_override_constants/margin_bottom = 48
+
+[node name="MenuBackground" parent="OuterMargin/Background" unique_id=913533153 instance=ExtResource("2_menu_bg")]
+layout_mode = 1
+
+[node name="ScrollContent" type="Control" parent="OuterMargin/Background" unique_id=135651706]
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="OuterMargin/Background/ScrollContent" unique_id=2130477522]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 60
+alignment = 1
+
+[node name="Title" type="Label" parent="OuterMargin/Background/ScrollContent/VBoxContainer" unique_id=128928405]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_fonts/font = ExtResource("3_pqmjv")
+theme_override_font_sizes/font_size = 120
+text = "CREDITS"
+horizontal_alignment = 1
+
+[node name="CreditsText" type="RichTextLabel" parent="OuterMargin/Background/ScrollContent/VBoxContainer" unique_id=1827988280]
+custom_minimum_size = Vector2(320, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.2, 0.15, 0.1, 1)
+theme_override_font_sizes/normal_font_size = 40
+theme_override_font_sizes/bold_font_size = 80
+theme_override_font_sizes/italics_font_size = 60
+bbcode_enabled = true
+text = "[center]
+[b]Art & Animation[/b]
+Mischa
+
+[b]Developer[/b]
+Elias
+
+[b]University[/b]
+FH Münster
+University of Applied Sciences
+Münster School of Design (MSD) &
+Electrical Engineering and Computer Science (ETI)
+
+[i]Course[/i]
+Gamedesign (Winter Semester 2025/26)
+
+[i]Supervised by[/i]
+Prof. Dr. Kathrin Ungru-Baggemann
+Prof. Dipl.-Des. Tina Glückselig
+
+[b]Fonts[/b]
+From Fontesk
+
+[font_size=60]Super Naive[/font_size]
+by All Super Font
+
+[font_size=60]Outline Style[/font_size]
+by Syafrizal a.k.a. Khurasan
+
+[b]Music & Sound[/b]
+
+[i]Music[/i]
+\"Kids Game Gaming Background Music\" by Maksym Malko from Pixabay
+
+[i]SFX[/i]
+From Freesound.org
+
+\"Rope Swooshing\" by Robo9418
+\"808BD_T1D7_X2wpo2.wav\" by bWpo
+\"Bamboo Swing, B5.wav\" by InspectorJ
+\"Message Notification 2\" by AnthonyRox
+\"vMax SourCream.wav\" by JFRecords
+\"bird_flapping_9.wav\" by Clusman
+\"Retro, Pew Shot.wav\" by LilMati
+\"fish_swim1\" by Rayo75
+\"CcubMetall01.wav\" by SuGu14
+\"soft button click 1\" by FOSSarts
+\"water-click.wav\" by CaptainYulef
+\"Whoosh -Plastic diving fin flat side - A-B 20cm - 1\" by Sadiquecat
+
+[b]Special Thanks[/b]
+Godot Engine Community
+Our Families
+[/center]"
+fit_content = true
+autowrap_mode = 3
+scroll_active = false

@@ -1,0 +1,4 @@
+[gd_scene format=3 uid="uid://d3yq8x4j5k2l1"]
+
+[node name="PooledSprite" type="Sprite2D"]
+visible = false

@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="CharacterSkin" load_steps=3 format=3 uid="uid://woolskin123"]
+
+[ext_resource type="Script" path="res://scripts/resources/character_skin.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dwou74m318rb4" path="res://assets/character/wool/wool.png" id="2_tex"]
+
+[resource]
+script = ExtResource("1_script")
+skin_name = "Wool"
+texture = ExtResource("2_tex")

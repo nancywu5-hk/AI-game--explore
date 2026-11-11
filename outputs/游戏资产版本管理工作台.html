@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>游戏资产版本管理工作台</title>
+<style>
+:root{
+  --bg:#eef1f6; --panel:#fff; --line:#e6e9f0; --text:#1c2434; --sub:#667085; --dim:#98a2b3;
+  --accent:#6d5efc; --accent-soft:#efeaff; --ok:#12b76a; --ok-soft:#e7f8ef; --warn:#f79009; --danger:#f04438;
+  --shadow:0 1px 2px rgba(16,24,40,.04);
+  --side:228px;
+}
+body.dark{
+  --bg:#12151c; --panel:#1b2030; --line:#2a3142; --text:#eef2f8; --sub:#a8b0c2; --dim:#7d879b;
+  --accent:#8b7cff; --accent-soft:#2a2550; --ok:#3dd68c; --ok-soft:#163528; --warn:#f5b14a; --danger:#ff7a72;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:13.5px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:var(--side) 1fr;min-height:100%}
+.side{background:var(--panel);border-right:1px solid var(--line);padding:16px 12px 24px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 16px}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:800}
+.brand b{display:block;font-size:13px;line-height:1.25;width:156px}
+.brand span{color:var(--dim);font-size:11px}
+.nav-g{margin:8px 0 4px;padding:0 10px;color:var(--dim);font-size:11px}
+.nav button{width:100%;text-align:left;border:0;background:transparent;border-radius:10px;padding:8px 10px;color:var(--sub);display:flex;gap:8px;align-items:center}
+.nav button.on{background:var(--accent-soft);color:var(--accent);font-weight:650}
+.nav button:hover{background:var(--accent-soft)}
+.main{min-width:0;display:flex;flex-direction:column;min-height:100vh}
+.top{min-height:58px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 18px;background:var(--panel);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.crumb{font-size:12px;color:var(--dim)}
+.crumb b{color:var(--text);font-size:14px;display:block;font-weight:650}
+.top-actions{display:flex;gap:8px;align-items:center}
+.ghost,.pri{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px}
+.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.ghost.on{background:var(--accent-soft);border-color:transparent;color:var(--accent)}
+.content{padding:18px 22px 40px}
+.h1{font-size:22px;margin:2px 0 4px}
+.lead{color:var(--sub);margin:0 0 14px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat .n{font-size:28px;font-weight:750;letter-spacing:-.03em}
+.stat .l{color:var(--sub);font-size:12px}
+.stat .s{color:var(--dim);font-size:11px;margin-top:4px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.grow{flex:1;min-width:260px}
+.tabs{display:flex;gap:16px;border-bottom:1px solid var(--line);margin:8px 0 12px}
+.tabs button{border:0;background:transparent;padding:8px 0;color:var(--sub);border-bottom:2px solid transparent}
+.tabs button.on{color:var(--accent);border-color:var(--accent);font-weight:650}
+.search{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.search input,.search select{border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px}
+.search input{flex:1}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;background:var(--panel)}
+.item.on{border-color:#c9c2ff;background:var(--accent-soft)}
+.item h3{margin:0 0 4px;font-size:14px}
+.meta{color:var(--dim);font-size:12px}
+.pill{display:inline-block;font-size:11px;padding:1px 7px;border-radius:999px;background:var(--bg);color:var(--sub);margin-right:4px}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.pill.wait{background:#fff6e8;color:#b54708}
+.pill.back{background:#fff1f0;color:var(--danger)}
+body.dark .pill.wait{background:#3a2d16;color:#f5b14a}
+.split{display:grid;grid-template-columns:minmax(200px,260px) minmax(0,1fr);gap:12px;align-items:start}
+.split3{display:grid;grid-template-columns:minmax(180px,220px) minmax(0,1fr) minmax(180px,240px);gap:12px;align-items:start}
+.list{max-height:calc(100vh - 150px);overflow:auto;padding-right:2px}
+.preview{min-height:220px;border-radius:12px;background:linear-gradient(180deg,#f7f4ff,#eef2ff);display:grid;place-items:center;position:relative;overflow:hidden}
+body.dark .preview{background:linear-gradient(180deg,#242038,#1b2030)}
+.fig{width:120px;height:180px}
+.sprite{max-width:220px;max-height:200px;image-rendering:pixelated;object-fit:contain}
+.sprite.run{animation:bob .55s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-8px)}}
+.play{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px}
+.bar{height:6px;background:#ddd8f5;border-radius:99px;flex:1;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent)}
+.bar i.run{animation:load 2.4s linear infinite}
+@keyframes load{from{width:0}to{width:100%}}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(108px,1fr));gap:6px;margin:12px 0}
+.step{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--panel);font-size:12px;color:var(--sub)}
+.step.on{background:var(--accent-soft);border-color:#d9d4ff;color:var(--accent);font-weight:650}
+.step b{display:block;font-size:11px;margin-bottom:2px}
+.gates{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+.gate{border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--panel)}
+.gate b{display:block;margin-bottom:4px}
+.kv{display:grid;grid-template-columns:88px 1fr;gap:4px 8px;font-size:12px}
+.kv span{color:var(--dim)}
+.table{width:100%;border-collapse:collapse;font-size:12.5px}
+.table th,.table td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.table th{color:var(--dim);font-weight:600}
+.meter{height:8px;border-radius:99px;background:#d7f5e5;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--ok)}
+.miss{background:#f2f4f7}
+.miss i{width:0}
+.flow{display:flex;flex-direction:column;align-items:center;gap:0;padding:8px}
+.node{border:1.5px solid #9db7e8;background:#f4f8ff;border-radius:12px;padding:14px 18px;min-width:280px;text-align:center;font-weight:650}
+body.dark .node{background:#1e2a44}
+.arrow{width:2px;height:28px;background:#9db7e8;position:relative}
+.arrow:after{content:"";position:absolute;left:-4px;bottom:-1px;border:5px solid transparent;border-top-color:#9db7e8}
+.toast{position:fixed;right:18px;bottom:18px;background:#1c2434;color:#fff;padding:10px 14px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.25s;pointer-events:none;z-index:20}
+.toast.show{opacity:1;transform:none}
+.log{position:fixed;right:16px;top:70px;width:340px;max-height:70vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;box-shadow:0 12px 40px rgba(16,24,40,.12);display:none;z-index:12}
+.log.show{display:block}
+.log li{margin:6px 0;color:var(--sub)}
+.sec{margin-top:12px}
+.sec h4{margin:0 0 8px}
+.note{font-size:12px;color:var(--dim);margin-top:8px}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap}
+textarea{width:100%;min-height:64px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:8px}
+.prog4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.prog4 div{height:8px;border-radius:99px;background:#e4e7ec}
+.prog4 div.done{background:var(--ok)}
+.prog4 div.run{background:var(--accent)}
+.thumb{height:92px;border-radius:8px;background:
+  linear-gradient(160deg,#243044,#6d5efc 70%,#d7c4a1);
+  position:relative}
+.thumb:after{content:"候选构图 · 人选定后才采用";position:absolute;left:8px;bottom:6px;font-size:11px;color:#fff}
+.room{display:grid;grid-template-columns:210px minmax(0,1fr) 300px;gap:12px;align-items:start}
+.roster .member{display:flex;gap:8px;align-items:center;padding:8px;border-radius:10px}
+.roster .member.on{background:var(--accent-soft)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--dim);flex:none}
+.dot.live{background:var(--ok)}
+.dot.busy{background:var(--warn)}
+.thread{display:flex;flex-direction:column;gap:10px;max-height:calc(100vh - 280px);overflow:auto;padding-right:4px}
+.bubble{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--panel)}
+.bubble.human{background:#eef3ff}
+body.dark .bubble.human{background:#1d2740}
+.bubble .who{font-size:12px;color:var(--sub);margin-bottom:4px}
+.think{margin-top:8px;padding:8px;border-radius:8px;background:var(--bg);color:var(--sub);font-size:12px}
+.artbox{height:168px;border-radius:12px;display:grid;place-items:center;background:
+  radial-gradient(circle at 50% 42%,#6f8f62 0 46px,#243044 47px);color:#fff;text-align:center}
+.artbox b{display:block;font-size:18px}
+.say{display:flex;gap:8px;margin-top:10px}
+.say input{flex:1;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:8px 10px}
+.modal{position:fixed;inset:0;background:rgba(16,24,40,.35);display:grid;place-items:center;z-index:30}
+.modal .card{width:min(720px,92vw);max-height:80vh;overflow:auto;padding:16px}
+@media(max-width:1100px){
+  .app{grid-template-columns:1fr}
+  .side{position:relative;height:auto;display:flex;flex-wrap:wrap;gap:8px}
+  .nav{display:flex;flex-wrap:wrap;gap:4px}
+  .split,.split3,.stats,.room{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand"><div class="mark">版</div><div><b>游戏资产版本管理工作台</b><span>Wool · MIT 开源游戏</span></div></div>
+    <div class="nav" id="nav"></div>
+    <p class="note" style="padding:12px 8px">上游 <a href="https://github.com/EliasSteffen/Wool">EliasSteffen/Wool</a><br>MIT · 2025 E. Steffen, Mischa<br>存档 nancywu5-hk/AI-game--explore</p>
+  </aside>
+  <section class="main">
+    <header class="top">
+      <div class="crumb"><b id="title">游戏资产版本管理工作台</b><span id="path">games/Wool · res://scenes/levels/level_1.tscn</span></div>
+      <div class="top-actions">
+        <button class="ghost" id="logBtn">生产日志</button>
+        <span class="pill ok">Python OK</span>
+        <button class="ghost" id="theme">暗色</button>
+      </div>
+    </header>
+    <div class="content" id="view"></div>
+  </section>
+</div>
+<div class="log" id="log"></div>
+<div class="toast" id="toast"></div>
+<script>
+const NAV=[
+  {g:"协作",items:[
+    ["room","联机房间"],
+    ["crew","成员与模型"],
+    ["board","交接与版本"]
+  ]},
+  {g:"生产",items:[
+    ["sprint","Sprint 卡片"],
+    ["role","角色流程"],
+    ["scene","场景流程"],
+    ["ui","UI 流程"],
+    ["audio","音频流程"],
+    ["quest","任务流程"]
+  ]},
+  {g:"账本",items:[
+    ["inv","资源盘点"],
+    ["invold","旧版资源盘点"],
+    ["book","管线规范和工作手册"],
+    ["struct","功能结构"],
+    ["sum","汇总"],
+    ["commit","提交"]
+  ]}
+];
+const GAME={name:"Wool",upstream:"https://github.com/EliasSteffen/Wool",license:"MIT",src:"../games/Wool/"};
+const SPRINTS=[
+  {id:"S096",title:"钩爪绳长与 Wool 跳跃不同步",ver:"scripts/features/grappling_feature.gd",st:"待验收",plan:"当前",body:"本卡只改钩爪绳长动画和 Wool 的 jump 循环。不改钉子碰撞，不改排行榜。",checks:["jump 动画不循环，见 wool.gd 的 set_animation_loop","绳长动画速度仍是 800 px/s，改动要写回本卡","未签认前不提交 scenes/levels/level_1.tscn"]},
+  {id:"S118",title:"Wool / Eagle / Fish 精灵登记",ver:"assets/character",st:"待验收",plan:"当前",body:"角色流程只认仓库里已有的精灵表，不另造一套帧。",checks:["Wool 有 idle、walk、jump、swing","Eagle 只有 fly.png","Fish 使用 fish.png，不借用 Wool 的表"]},
+  {id:"S074",title:"UI 主题与按钮源锁定",ver:"assets/ui/global_theme.tres",st:"已验收",plan:"历史",body:"按钮、暂停、关闭都用 assets/ui 里的源图。主题文件是 res://assets/ui/global_theme.tres。",checks:["project.godot 的 gui/theme/custom 指向 global_theme.tres","button.png、pause-button.png、close-button.png 都在盘点里","换皮不直接改场景里的贴图路径"]},
+  {id:"S144",title:"音效键与文件一一对应",ver:"scripts/globals/audio_manager.gd",st:"已验收",plan:"当前",body:"AudioManager 的键必须能找到 wav 或 mp3。缺文件的键不能算已登记。",checks:["wool_hook → assets/sound/wool/hook.wav","enemy_fish_start / enemy_fish_end 成对","背景乐是 assets/sound/game/background.mp3"]}
+];
+const ROLES=[
+  {name:"Wool",id:"wool",kind:"主角 · 钩爪",rev:"scenes/characters/players/wool.tscn",script:"scripts/characters/wool.gd",anims:["idle","walk","jump","swing"],sheet:{idle:"assets/character/wool/idle.png",walk:"assets/character/wool/walk.png",jump:"assets/character/wool/jump.png",swing:"assets/character/wool/swing.png"}},
+  {name:"Eagle",id:"eagle",kind:"敌人 · 飞行",rev:"scenes/characters/enemies/eagle.tscn",script:"scripts/characters/eagle.gd",anims:["fly"],sheet:{fly:"assets/character/eagle/fly.png"}},
+  {name:"Fish",id:"fish",kind:"敌人 · 跃出",rev:"scenes/characters/enemies/fish.tscn",script:"scripts/characters/fish.gd",anims:["idle"],sheet:{idle:"assets/character/fish/fish.png"}},
+  {name:"Spucki",id:"plant",kind:"敌人 · 平台植物",rev:"scenes/characters/enemies/plant.tscn",script:"scripts/characters/plant.gd",anims:["idle"],sheet:{idle:"assets/character/spucki/pflanze.png"}}
+];
+const SCENES=[
+  {name:"Level 1",id:"scenes/levels/level_1.tscn",tag:"主关",img:"assets/map/background.png",note:"project.godot 的 run/main_scene。脚本是 scripts/levels/level_1.gd。"},
+  {name:"平台与钉子",id:"scenes/interactions/nail.tscn",tag:"机关",img:"assets/map/platform.png",note:"普通钉、加速钉、生锈钉分开做。碰撞不跟贴图绑在同一张卡上。"},
+  {name:"击杀区",id:"scenes/terrain/kill_zone.tscn",tag:"地形",img:"assets/map/pin-red.png",note:"kill_zone.gd 只负责出界。不改 Wool 的跳跃参数。"}
+];
+const UIASSETS=[
+  {name:"button",file:"assets/ui/button.png"},
+  {name:"pause-button",file:"assets/ui/pause-button.png"},
+  {name:"close-button",file:"assets/ui/close-button.png"},
+  {name:"logo",file:"assets/ui/logo.png"},
+  {name:"global_theme",file:"assets/ui/global_theme.tres"}
+];
+const CUES=[
+  {name:"wool_hook",file:"assets/sound/wool/hook.wav"},
+  {name:"wool_swing",file:"assets/sound/wool/swing.wav"},
+  {name:"wool_die",file:"assets/sound/wool/die.wav"},
+  {name:"enemy_bird",file:"assets/sound/enemies/bird.wav"},
+  {name:"enemy_fish_start",file:"assets/sound/enemies/fish-start.wav"},
+  {name:"background",file:"assets/sound/game/background.mp3"}
+];
+const QUESTS=[
+  {id:"UI-01",name:"暂停菜单",who:"现行本稿",lines:[["Settings","settings_button.text"],["Leaderboard","leaderboard_button.text"],["源文件","scripts/ui/pause_menu.gd"]]},
+  {id:"UI-02",name:"结算名次",who:"现行本稿",lines:[["加载","Platz wird geladen …"],["无名次","Noch keine Platzierung"],["源文件","scripts/ui/game_over.gd"]]},
+  {id:"UI-03",name:"交互提示",who:"现行本稿",lines:[["模板","Press %s to %s"],["源文件","scripts/interactions/interaction.gd"]]},
+  {id:"UI-04",name:"旧排行占位",who:"旧版草稿",lines:[["草稿","排行榜文案曾写进场景，已退回脚本。"]]}
+];
+const BOOKS=[
+  ["README","游戏说明","Wool","上游仓库"],
+  ["LICENSE","MIT","2025","E. Steffen, Mischa"],
+  ["architecture.md","结构说明","Godot 4.7","Mobile"],
+  ["project.godot","工程入口","level_1.tscn","主场景"],
+  ["scripts/globals/audio_manager.gd","音效登记","键到文件","工作手册"],
+  ["scripts/features/grappling_feature.gd","钩爪","绳约束","工作手册"]
+];
+const DOMAINS=[
+  {name:"钩爪与玩家状态",nodes:["IDLE","JUMP","GRAPPLE","RELEASE"],note:"Wool 继承 BasePlayer。钩爪在 GrapplingFeature，绳长动画默认 800 px/s。"},
+  {name:"音频总线",nodes:["Master","Music","SFX"],note:"AudioManager 启动时 Master 0.5、Music 0.15、SFX 0.5。背景乐固定 background.mp3。"},
+  {name:"排行榜与存档",nodes:["LOCAL","HTTP","RESULT"],note:"本地后端和 Firebase 后端分开。结算文案在 game_over.gd，不写进关卡场景。"}
+];
+const COMMITS=[
+  ["modified","scripts/characters/wool.gd","上游"],
+  ["modified","scripts/features/grappling_feature.gd","上游"],
+  ["modified","assets/character/wool/jump.png","上游"],
+  ["modified","scenes/levels/level_1.tscn","上游"],
+  ["added","assets/sound/wool/hook-2.wav","新增"],
+  ["modified","scripts/globals/audio_manager.gd","上游"]
+];
+const GATES=[
+  ["主场景仍是 level_1","已核对","project.godot"],
+  ["钩爪脚本在库","已核对","scripts/features/grappling_feature.gd"],
+  ["音效键对得上文件","已核对","scripts/globals/audio_manager.gd"],
+  ["跳转动画不循环","待人看","scripts/characters/wool.gd"],
+  ["hook-2 尚未登记","待签认","assets/sound/wool/hook-2.wav"],
+  ["执行者自己验收","禁止","真人签认前不写入 main"]
+];
+const CREW=[
+  {name:"制作人",kind:"人",st:"在线",dot:"live",duty:"房主。验收、退回、签认。",model:"—",wake:"—"},
+  {name:"美术复核",kind:"人",st:"在线",dot:"live",duty:"看候选图，提出修改。不直接入库。",model:"—",wake:"—"},
+  {name:"程序复核",kind:"人",st:"在线",dot:"live",duty:"看白模、脚本和差异。",model:"—",wake:"—"},
+  {name:"记录员",kind:"Agent",st:"静默",dot:"",duty:"只整理纪要和待办，不接执行任务。",model:"记录模型",wake:"静默"},
+  {name:"PM",kind:"Agent",st:"分派",dot:"busy",duty:"判断交给谁，钉住里程碑。不改仓库。",model:"分派模型",wake:"@唤起 · 新消息 · 每 15 分钟"},
+  {name:"美术",kind:"Agent",st:"出图",dot:"busy",duty:"只产候选。不装入正式目录，不写玩法代码。",model:"出图模型",wake:"仅 @唤起"},
+  {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"核验模型",wake:"仅 @唤起"},
+  {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"版控模型",wake:"仅 @唤起"}
+];
+const state={view:"room",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"idle",playing:false,quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,
+  signed:false,artVer:2,repo:"等待签认",thinkOn:false,draft:"",waiting:false,focus:"美术",
+  msgs:[
+    {who:"制作人",kind:"human",text:"@PM S096。只核对 Wool 的 jump 循环和 grappling_feature.gd 的绳长。不要改 level_1 的钉子碰撞，也不要自己提交。"},
+    {who:"PM",kind:"ai",model:"分派",think:"卡上写了不做什么。看精灵和看脚本可以并行，提交必须等人签认。",text:"已钉在 S096。@美术 对照 assets/character/wool 的四张表。@场景 只读 scenes/levels/level_1.tscn。@版本 在签认前不要动仓库。"},
+    {who:"美术",kind:"ai",model:"出图",think:"仓库里已有 idle、walk、jump、swing。我只核对，不另存一套。",text:"Wool 四张精灵表都在 assets/character/wool。jump.png 对应脚本里关掉循环的那条动画。",artifact:"jump.png"},
+    {who:"美术复核",kind:"human",text:"jump 表可以用。不要把 Eagle 的 fly.png 套到 Wool 上。"},
+    {who:"场景",kind:"ai",model:"核验",think:"主场景路径以 project.godot 为准。",text:"run/main_scene 仍是 res://scenes/levels/level_1.tscn。钉子场景 nail.tscn、boost_nail.tscn、rusty_nail.tscn 都在，碰撞脚本没有新差异。"}
+  ]};
+const logs=["16:40 导入 EliasSteffen/Wool 源码树","16:41 角色流程 · Wool idle/walk/jump/swing","16:42 音效键对照 audio_manager.gd","16:43 S096 钩爪卡等待真人签认"];
+function $(s){return document.querySelector(s)}
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1600)}
+function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+function nav(){
+  $("#nav").innerHTML=NAV.map(g=>`<div class="nav-g">${g.g}</div>`+g.items.map(([id,name])=>`<button data-v="${id}" class="${state.view===id?"on":""}">${name}</button>`).join("")).join("");
+  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.view=b.dataset.v;render()};
+}
+function steps(names,on=0){
+  return `<div class="steps">${names.map((n,i)=>`<div class="step ${i===on?"on":""}"><b>0${i+1}</b>${n}</div>`).join("")}</div>`;
+}
+function gates(){
+  return `<div class="gates">
+    <div class="gate"><span class="pill">尚未解锁</span><b>技术 / 源 QA</b>需要本卡能复算的源、文件存在且哈希一致。</div>
+    <div class="gate"><span class="pill">尚未解锁</span><b>真实运行</b>宿主入口、实际状态及 GPU 证据。静态预览不算运行。</div>
+    <div class="gate"><span class="pill">尚未解锁</span><b>Agent 看图</b>需同帧对比目标图。正规尺寸与构图不能只看风格分。</div>
+    <div class="gate"><span class="pill">尚未解锁</span><b>用户签认</b>原作者事实记录。本轮验收不由执行者自己闭环。</div>
+  </div><p class="note">这四道是放行闸门。事实记在来源里。人工闸门不通过，就不放行。</p>`;
+}
+function sprite(role,anim){
+  const file=(role.sheet&&role.sheet[anim])||Object.values(role.sheet||{})[0];
+  return `<img class="sprite ${state.playing?"run":""}" alt="${esc(role.name)}" src="${GAME.src}${file}">`;
+}
+function viewSprint(){
+  const list=SPRINTS.filter(s=>s.plan===(state.tab==="当前"?"当前":state.tab==="历史"?"历史":s.plan))
+    .filter(s=>state.fst==="全部"||s.st===state.fst)
+    .filter(s=>(s.id+s.title).includes(state.q));
+  const open=list[0];
+  return `<h1 class="h1">Sprint 卡片</h1><p class="lead">审计当前计划。逐卡验收，并锁住这一版的历史。</p>
+    <div class="stats">
+      <div class="stat"><div class="n">4</div><div class="l">Wool 验收卡</div><div class="s">对着已导入的源码树，不是上游的迭代次数</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">待验收</div><div class="s">钩爪手感、角色精灵登记</div></div>
+      <div class="stat"><div class="n">2</div><div class="l">已验收</div><div class="s">UI 主题、音效键</div></div>
+      <div class="stat"><div class="n">65</div><div class="l">GDScript</div><div class="s">另有 28 个场景、44 张 PNG</div></div>
+    </div>
+    <div class="tabs">
+      ${["当前","历史","独立"].map(t=>`<button data-t="${t}" class="${state.tab===t?"on":""}">${t==="当前"?"当前计划":t==="历史"?"历史主卡":"独立资源"}</button>`).join("")}
+    </div>
+    <div class="search"><input id="sq" placeholder="搜索卡号、标题或责任人" value="${esc(state.q)}">
+      <select id="sf">${["全部","待验收","已验收","退回"].map(x=>`<option ${state.fst===x?"selected":""}>${x}</option>`).join("")}</select>
+    </div>
+    ${list.map(s=>`<article class="item ${open&&s.id===open.id?"on":""}"><h3>${s.id}　${esc(s.title)}</h3><div class="meta">${esc(s.ver)}</div><span class="pill ${s.st==="已验收"?"ok":"wait"}">${s.st}</span>
+      <p>${esc(s.body)}</p><b>验收条件</b><ul>${s.checks.map(c=>`<li>${esc(c)}</li>`).join("")}</ul></article>`).join("")||`<p class="lead">这一组没有卡片。</p>`}
+    <p class="note">这些卡是工作台盖在 Wool 源码树上的验收合同。上游仓库本身没有这套 Sprint 编号。</p>`;
+}
+function viewRole(){
+  const r=ROLES[state.role];
+  const anim=r.anims.includes(state.dir)?state.dir:r.anims[0];
+  const names=["场景","脚本","精灵表","动作名","音效键","装入关卡","运行确认"];
+  return `<div class="split"><div class="card list" style="padding:8px">${ROLES.map((x,i)=>`<button class="item ${i===state.role?"on":""}" data-r="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.script)}</div></button>`).join("")}</div>
+    <div><div class="card" style="padding:14px"><div class="row"><div class="grow"><div class="preview">${sprite(r,anim)}</div>
+      <div class="play"><span class="meta">${esc(anim)}</span><div class="bar"><i class="${state.playing?"run":""}"></i></div>
+        <button class="ghost" id="play">${state.playing?"暂停":"播放"}</button>
+        <select id="dir">${r.anims.map(d=>`<option ${anim===d?"selected":""}>${d}</option>`).join("")}</select></div></div>
+      <div style="flex:1 1 240px;max-width:320px"><div class="kv"><span>场景</span><b>${esc(r.rev)}</b><span>脚本</span><b>${esc(r.script)}</b><span>当前表</span><b>${esc(r.sheet[anim])}</b><span>许可</span><b>MIT</b></div>
+      <p class="note">图来自 games/Wool，不是另绘的候选。换动作只切换仓库里的文件。</p></div></div>
+      <h4>制作步骤</h4>${steps(names,2)}
+      <div class="row"><p class="grow">先对上场景、脚本和精灵表。Wool 的 jump 在 wool.gd 里被设成不循环。制作执行单只记录这三样的路径，不改文件。</p><button class="pri" id="run">制作执行单</button></div>
+      <h4>本轮验收</h4>${gates()}
+    </div></div></div>`;
+}
+function viewScene(){
+  const s=SCENES[state.scene];
+  const names=["功能与走查","白模定标","目标帧","四向细化","逐区与校验","图层与状态","照相机与结尾"];
+  return `<div class="split"><div class="card list" style="padding:8px">${SCENES.map((x,i)=>`<button class="item ${i===state.scene?"on":""}" data-s="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.id)} · ${esc(x.tag)}</div></button>`).join("")}</div>
+    <div class="card" style="padding:14px"><div class="row"><div class="preview grow" style="min-height:180px;background:#322"><img class="sprite" alt="${esc(s.name)}" src="${GAME.src}${s.img}"></div>
+      <div style="flex:1 1 240px;max-width:360px"><b>当前关卡文件</b><div class="kv" style="margin-top:8px"><span>场景</span><b>${esc(s.id)}</b><span>说明</span><b>${esc(s.note)}</b></div></div></div>
+      <h4>制作步骤</h4>${steps(names,1)}
+      <div class="row"><p class="grow">关卡、钉子和击杀区分开验收。贴图在 assets/map，场景在 scenes。改碰撞要单独开卡。</p><button class="pri" id="run">制作执行单</button></div>
+      <h4>本轮验收</h4>${gates()}
+      <p class="note">仓库里有 28 个 .tscn。主场景只有 level_1。</p>
+    </div></div>`;
+}
+function viewUI(){
+  const comps=UIASSETS;
+  const cur=comps[3];
+  return `<div class="split"><div class="card list" style="padding:8px">${comps.map((c,i)=>`<div class="item ${i===3?"on":""}"><b>${esc(c.name)}</b><div class="meta">${esc(c.file)}</div></div>`).join("")}</div>
+    <div class="card" style="padding:14px"><div class="preview" style="background:#243044"><img class="sprite" alt="${esc(cur.name)}" src="${GAME.src}${cur.file}"></div>
+      <p class="meta">res://${cur.file} · 主题 res://assets/ui/global_theme.tres</p>
+      <h4>制作步骤</h4>${steps(["宿主与语义","原生采样","组件与数据","源卡与画板","主题接入","尺寸与交互","视觉与确认"],0)}
+      <div class="row"><p class="grow">宿主实际宿主、组件目录与当前卡，问题复用时停。POSE 只在其明确范围内用。执行单锁定当前规格与 SHA。</p><button class="pri" id="run">制作执行单</button></div>
+      <h4>本轮核验</h4><div class="gates"><div class="gate"><b>技术 / 源 QA</b>稿、主题、配色、源 SHA 与比例，不只放文件存在。</div><div class="gate"><b>真实宿主</b>点击命中面、控件状态、尺寸、交互与真实样张效果。</div><div class="gate"><b>Agent 看图</b>同帧对比目标卡的角色、文字、描边和间隙。</div><div class="gate"><b>用户签认</b>原作者事实记录。</div></div></div></div>`;
+}
+function viewAudio(){
+  const cues=CUES;
+  const c=cues[state.audio];
+  return `<div class="split"><div class="card list" style="padding:8px">${cues.map((x,i)=>`<button class="item ${i===state.audio?"on":""}" data-a="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.file)}</div></button>`).join("")}</div>
+    <div class="card" style="padding:14px"><div class="row"><div class="preview grow"><div style="text-align:center"><div style="font-size:28px;color:var(--accent)">♪</div><b>${esc(c.name)}</b><audio id="clip" src="${GAME.src}${c.file}"></audio><div class="play"><div class="bar"><i class="${state.aud?"run":""}"></i></div><button class="ghost" id="aud">${state.aud?"暂停":"试听"}</button></div></div></div>
+      <div style="flex:1 1 220px;max-width:300px" class="kv"><span>键</span><b>${esc(c.name)}</b><span>文件</span><b>${esc(c.file)}</b><span>登记处</span><b>audio_manager.gd</b><span>许可</span><b>MIT</b></div></div>
+      <h4>制作步骤</h4>${steps(["用途与事实","谱与许可","构造与曲库","处理与 QC","cue 与混音","真实宿主","听审与交付"],0)}
+      <p>键名来自 AudioManager 的常量表。试听播放的是 games/Wool 里的文件。hook-2.wav 在磁盘上，但还没有写进 _sound_files。</p>
+      <h4>本轮核验</h4>${gates()}</div></div>`;
+}
+function viewQuest(){
+  const q=QUESTS[state.quest];
+  const shown=QUESTS.filter(x=>state.qtab==="全部"||x.who.startsWith(state.qtab));
+  return `<div class="split3"><div class="card" style="padding:10px"><b>界面文案</b><div class="meta">来自脚本里的原文，共 ${QUESTS.length} 条</div><div class="tabs">${["现行","旧版","全部"].map(t=>`<button data-qt="${t}" class="${state.qtab===t?"on":""}">${t}</button>`).join("")}</div>
+    ${shown.map((x)=>`<button class="item ${x.id===q.id?"on":""}" data-q="${QUESTS.indexOf(x)}" style="width:100%;text-align:left"><b>${x.id} ${esc(x.name)}</b><div class="meta">${esc(x.who)}</div></button>`).join("")}</div>
+    <div class="card" style="padding:14px"><h2 style="margin:0 0 8px">${esc(q.name)}</h2>${q.lines.map(([w,t])=>`<div class="meta">${esc(w)}</div><p>${esc(t)}</p>`).join("")}
+      <div class="btnrow"><button class="ghost">保存草稿</button><button class="pri" id="saveq">保存并校验源文本</button><button class="ghost">恢复已发布稿</button></div>
+      <p class="note">文案以脚本为准。改字要改对应的 .gd，不改场景里的临时字符串。</p></div>
+    <div class="card" style="padding:12px"><b>Wool</b><img class="sprite" alt="Wool" src="${GAME.src}assets/character/wool/wool.png" style="margin-top:8px"><p class="note">界面不另画角色。这张是 assets/character/wool/wool.png。</p></div></div>`;
+}
+function invTable(old){
+  const rows=["Wool","Eagle","Fish","Level 1","钉子","按钮","钩爪音","背景乐"];
+  return `<table class="table"><tr><th>树状</th><th>立绘</th><th>头像</th><th>四向角色</th><th>场景与装配</th><th>UI</th><th>音效</th></tr>
+    ${rows.map((n,i)=>{const miss=old&&i%3===0;return `<tr><td>${n}</td>${[1,1,1,1,1,1].map((_,k)=>`<td><div class="meter ${miss&&k>2?"miss":""}"><i style="width:${miss&&k>2?0:100}%"></i></div></td>`).join("")}</tr>`}).join("")}</table>`;
+}
+function viewInv(old){
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">${old?"未登记的文件":"当前资源盘点"}</h1><p class="lead">${old?"hook-2.wav 在磁盘上，但 audio_manager.gd 的 _sound_files 还没有这个键。":"按 Wool 仓库里的文件点名。文件在，不等于这张卡已经验收。"}</p></div><button class="pri" id="ref">刷新</button></div>
+    <p>${old?"未登记音效 1 · hook-2.wav":"GDScript 65 · 场景 28 · PNG 44 · 音效 14"}</p>
+    <div class="card" style="padding:8px 12px">${invTable(old)}</div>
+    <p class="note">${old?"这行只标记未登记，不作为放行依据。":"绿条表示 games/Wool 里有对应文件。营销片和安装包没有放进这棵树。"}</p>`;
+}
+function viewBook(){
+  const rows=BOOKS.filter(b=>(state.bookD==="全部"||b[1].includes(state.bookD))&&b.join(" ").includes(state.bookQ));
+  return `<h1 class="h1">规范与工作手册</h1><p class="lead">查看现行合同、制作手册与更新时间。当卡与手册冲突时，以卡为准，手册只作参考。</p>
+    <div class="search"><input id="bq" placeholder="搜规范、手册、用途或路径" value="${esc(state.bookQ)}">
+      <select id="bd">${["全部","MIT","音效","钩爪"].map(d=>`<option ${state.bookD===d?"selected":""}>${d}</option>`).join("")}</select>
+      <button class="pri" id="ref">刷新目录</button></div>
+    <div class="card" style="padding:8px 12px"><table class="table"><tr><th>规范 / 手册</th><th>领域</th><th>最近修订</th><th>生效</th><th></th></tr>
+      ${rows.map(b=>`<tr><td><b>${esc(b[0])}</b><div class="meta">${esc(b[1])}</div></td><td><span class="pill ok">现行入口</span></td><td>${esc(b[2])}<div class="meta">${esc(b[3])}</div></td><td>已提交</td><td><button class="ghost" data-open="${esc(b[0])}">打开文档</button></td></tr>`).join("")}</table></div>`;
+}
+function viewStruct(){
+  const d=DOMAINS[state.dom];
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">功能结构</h1><p class="lead">三条来自 Wool 的自动加载：钩爪、音频总线、排行榜。看调用关系，不从文件名猜。</p></div><button class="pri" id="ref">刷新结构</button></div>
+    <div class="split"><div class="card list" style="padding:8px">${DOMAINS.map((x,i)=>`<button class="item ${i===state.dom?"on":""}" data-d="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b></button>`).join("")}</div>
+    <div class="card" style="padding:16px"><p>${esc(d.note)}</p><div class="flow">${d.nodes.map((n,i)=>`<div class="node">${esc(n)}</div>${i<d.nodes.length-1?'<div class="arrow"></div>':""}`).join("")}</div>
+      <div class="search"><input id="impact" placeholder="改动影响，例如 scripts/characters/wool.gd"><button class="ghost" id="lockd">定位领域与上下游</button></div></div></div>`;
+}
+function viewSum(){
+  const rows=[["GDScript","65"],["场景 tscn","28"],["PNG","44"],["音效 wav","12"],["音乐 mp3","2"],["验收卡","4"]];
+  return `<h1 class="h1">汇总</h1><p class="lead">这棵树是 <a href="${GAME.upstream}">EliasSteffen/Wool</a> 的源码和资产，MIT，版权 2025 E. Steffen, Mischa。营销片没有放进来。</p>
+    <div class="card" style="padding:8px 12px"><table class="table"><tr><th>已导入</th><th>数量</th></tr>${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")}</table></div>
+    <div class="stats" style="margin-top:12px"><div class="stat"><b>多人同屏</b><p class="meta">真人复核，Agent 分派、出图、核验、版控、记录。同一张卡，各自的边界。</p></div><div class="stat"><b>功能结构可理解</b><p class="meta">Sprint、五条职能、盘点、规范、结构、汇总、提交，一屏可见。</p></div>
+      <div class="stat"><b>生成内容可理解</b><p class="meta">每个产物可预览、对比、追来源，不读代码也能判断对不对。</p></div>
+      <div class="stat"><b>规范流程强管控</b><p class="meta">每张卡写明做什么、不做什么、怎么验收。闸门不通过不放行。</p></div></div>
+    <p class="note">主场景 res://scenes/levels/level_1.tscn。视口 2532×1170。存档仓库是 github.com/nancywu5-hk/AI-game--explore。</p>`;
+}
+function viewCommit(){
+  const names=["前置预检","SVN 提交","仓库核对","历史归档"];
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">提交中心</h1><p class="lead">每个任务一张交付卡。审核范围和触点后由你提交。并行生产，串行集成。</p></div><button class="pri" id="refreshc">刷新提交卡</button></div>
+    <div class="stats"><div class="stat"><div class="n">1</div><div class="l">待提交卡</div></div><div class="stat"><div class="n">${COMMITS.length}</div><div class="l">本卡文件</div></div><div class="stat"><div class="n">S096</div><div class="l">钩爪与跳跃</div></div></div>
+    <div class="split"><div class="card" style="padding:12px"><span class="pill ok">待检查</span><h3>Wool 钩爪与跳跃</h3><div class="meta">S096 · games/Wool<br>上游 EliasSteffen/Wool</div></div>
+      <div class="card" style="padding:12px"><b>提交内容</b>
+        <table class="table"><tr><th>状态</th><th>路径</th><th>相对</th><th></th></tr>${COMMITS.map(c=>`<tr><td>${c[0]}</td><td>${esc(c[1])}</td><td>${c[2]}</td><td><button class="ghost" id="seediff">查看 diff</button></td></tr>`).join("")}</table>
+        ${state.diff?`<pre class="meta">scripts/characters/wool.gd\n  set_animation_loop("jump", false)\n\nscripts/globals/audio_manager.gd\n  未登记 assets/sound/wool/hook-2.wav</pre>`:""}
+      </div></div>
+    <div class="card sec" style="padding:12px"><b>提交前闸门</b><table class="table">${GATES.map(g=>`<tr><td>${esc(g[0])}</td><td><span class="pill ${g[1].startsWith("已")?"ok":""}">${esc(g[1])}</span></td><td class="meta">${esc(g[2])}</td></tr>`).join("")}</table>
+      <h4>提交操作</h4><textarea id="msg">S096 Wool 钩爪与跳跃：只含已签认的脚本和精灵</textarea>
+      <div class="btnrow" style="margin-top:8px"><button class="pri" id="doCommit">提交此卡</button><button class="ghost" id="recheck">重新检查</button></div>
+      <div class="prog4">${names.map((_,i)=>`<div class="${state.phase>i?"done":state.phase===i?"run":""}"></div>`).join("")}</div>
+      <div class="meta">${names.map((n,i)=>`${i+1}. ${n}`).join(" · ")} ${state.phase>=4?"· 提交完成 r290":state.phase>=0?"· 执行中":""}</div>
+    </div>`;
+}
+function replyTo(text){
+  const hit=name=>text.includes("@"+name);
+  const out=[];
+  if(hit("PM")) out.push({who:"PM",kind:"ai",model:"分派",think:"先看 S096 的范围。看精灵和读关卡可以并行，提交必须串行。",text:"仍钉在 S096。美术和场景可以同时做。版本 Agent 在签认前不碰 games/Wool。"});
+  if(hit("美术")){state.artVer++;out.push({who:"美术",kind:"ai",model:"出图",think:"只切换仓库里已有的表，不另存新图。",text:"已再对一遍 assets/character/wool。Eagle 的 fly.png 没有套到 Wool 上。",artifact:"jump.png"});}
+  if(hit("场景")) out.push({who:"场景",kind:"ai",model:"核验",think:"以 project.godot 的 main_scene 为准。",text:"level_1.tscn 没有新差异。钉子三个场景都在，碰撞脚本未改。"});
+  if(hit("版本")){
+    if(!state.signed) out.push({who:"版本",kind:"ai",model:"版控",think:"闸门未过。现在提交会把未签认的 wool.gd 写进存档仓库。",text:"先不提交。S096 还差用户签认。hook-2.wav 还没登记进 audio_manager.gd，这轮也不带上。"});
+    else if(state.repo==="已提交") out.push({who:"版本",kind:"ai",model:"版控",text:"这一轮已经记入存档。没有新的文件差异，不重复提交。"});
+    else {state.repo="已提交";out.push({who:"版本",kind:"ai",model:"版控",think:"只提交本卡列出的脚本和精灵。hook-2.wav 未登记，跳过。",text:"已把 S096 的差量准备好：wool.gd、grappling_feature.gd、jump.png、level_1.tscn。未登记的 hook-2.wav 没有放进去。"});}
+  }
+  if(hit("记录员")) out.push({who:"记录员",kind:"ai",model:"静默",text:"简报：Wool 源码树已导入。S096 只覆盖钩爪和跳跃。签认前没有提交。"});
+  if(!out.length) out.push({who:"PM",kind:"ai",model:"分派",text:"用 @美术、@场景、@版本、@记录员 或 @PM 点名。Wool 的主场景路径我不会改。"});
+  return out;
+}
+function sendRoom(){
+  const text=(state.draft||"").trim();
+  if(!text){toast("先写一句，或用 @点名");return}
+  if(state.waiting){toast("上一条还在思考");return}
+  state.msgs.push({who:"制作人",kind:"human",text});
+  state.draft="";
+  const replies=replyTo(text);
+  state.waiting=true;
+  render();
+  setTimeout(()=>{state.msgs.push(...replies);state.waiting=false;render();},700);
+}
+function viewRoom(){
+  const me=CREW.find(c=>c.name===state.focus)||CREW[5];
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">联机房间</h1><p class="lead">真人与 Agent 看同一份 Wool 源码。出图和读关卡并行，签认和提交串行。</p></div>
+    <div class="btnrow"><button class="ghost" id="think">${state.thinkOn?"收起思考":"观察思考"}</button><button class="ghost" id="tocrew">成员与模型</button></div></div>
+    <div class="room">
+      <div class="card roster" style="padding:8px">
+        <div class="meta" style="padding:6px 8px">房间里的人</div>
+        ${CREW.filter(c=>c.kind==="人").map(c=>`<button class="member ${state.focus===c.name?"on":""}" data-who="${c.name}"><i class="dot ${c.dot}"></i><span><b>${c.name}</b><div class="meta">${c.st}</div></span></button>`).join("")}
+        <div class="meta" style="padding:8px 8px 4px">Agent</div>
+        ${CREW.filter(c=>c.kind==="Agent").map(c=>`<button class="member ${state.focus===c.name?"on":""}" data-who="${c.name}"><i class="dot ${c.dot}"></i><span><b>${c.name}</b><div class="meta">${c.st} · ${c.model}</div></span></button>`).join("")}
+      </div>
+      <div class="card" style="padding:12px">
+        <div class="thread">${state.msgs.map(m=>`<div class="bubble ${m.kind}"><div class="who">${esc(m.who)}${m.model?" · "+esc(m.model):""}</div><div>${esc(m.text)}</div>${m.artifact?`<div class="meta">产物 ${esc(m.artifact)} · 未入库</div>`:""}${state.thinkOn&&m.think?`<div class="think">${esc(m.think)}</div>`:""}</div>`).join("")}
+        ${state.waiting?`<div class="meta">思考中… 每个 Agent 有自己的思考空间</div>`:""}</div>
+        <div class="say"><input id="say" placeholder="用 @美术 @场景 @版本 @记录员 @PM 点名" value="${esc(state.draft)}"><button class="pri" id="send">发送</button></div>
+        <p class="note">当前焦点 ${esc(me.name)}：${esc(me.duty)}</p>
+      </div>
+      <div class="card" style="padding:12px">
+        <b>S096 · Wool jump</b>
+        <div class="preview" style="margin:10px 0;min-height:160px"><img class="sprite ${state.playing?"run":""}" alt="Wool jump" src="${GAME.src}assets/character/wool/jump.png"></div>
+        <div class="kv"><span>脚本</span><b>wool.gd</b><span>钩爪</span><b>grappling_feature.gd</b><span>签认</span><b>${state.signed?"已签认":"未签认"}</b><span>仓库</span><b>${esc(state.repo)}</b></div>
+        <div class="btnrow" style="margin-top:10px"><button class="pri" id="sign">${state.signed?"已签认":"真人签认"}</button><button class="ghost" id="askrepo">让版本提交</button></div>
+        <p class="note">共同审阅在这里完成。版本 Agent 看见签认之后，才把差量写入存档仓库。</p>
+      </div>
+    </div>`;
+}
+function viewCrew(){
+  return `<h1 class="h1">成员与模型</h1><p class="lead">人和 Agent 都在房间里。Agent 分工不同，唤起方式不同。静默的记录员不接执行任务。</p>
+    <div class="card" style="padding:8px 12px"><table class="table"><tr><th>成员</th><th>身份</th><th>模型 / 状态</th><th>唤起</th><th>职责边界</th></tr>
+      ${CREW.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.kind)}</td><td>${esc(c.model)}<div class="meta">${esc(c.st)}</div></td><td>${esc(c.wake)}</td><td>${esc(c.duty)}</td></tr>`).join("")}
+    </table></div>
+    <p class="note">常用角色可以预置，但每个角色的仓库权限仍是最小权限。版本 Agent 不能绕过签认。</p>`;
+}
+function viewBoard(){
+  const rows=[
+    ["assets/character/wool/jump.png","美术","已核对","对应 wool.gd 里不循环的 jump"],
+    ["assets/character/eagle/fly.png","美术","已隔离","不套到 Wool"],
+    ["scenes/levels/level_1.tscn","场景","已核对","仍是 project.godot 的主场景"],
+    ["用户签认","制作人",state.signed?"已签认":"待签认","执行者不能自己闭环"],
+    ["audio_manager.gd","记录员","可写入","hook-2.wav 尚未登记"],
+    ["存档提交","版本",state.repo,"只收本卡列出的文件"]
+  ];
+  return `<h1 class="h1">交接与版本</h1><p class="lead">S096 上的交接。多人同时看 Wool 的文件，版本只收已签认的差量。</p>
+    <div class="card" style="padding:8px 12px"><table class="table"><tr><th>事项</th><th>负责人</th><th>状态</th><th>备注</th></tr>
+      ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td><span class="pill ${r[2]==="待签认"||r[2]==="等待签认"?"wait":"ok"}">${esc(r[2])}</span></td><td class="meta">${esc(r[3])}</td></tr>`).join("")}
+    </table></div>
+    <div class="stats" style="margin-top:12px">
+      <div class="stat"><b>独立思考</b><p class="meta">每个 Agent 有自己的过程。房间里看得到结论，也可以打开思考。</p></div>
+      <div class="stat"><b>并行生产</b><p class="meta">美术出候选，场景核白模，可以同时进行。</p></div>
+      <div class="stat"><b>串行集成</b><p class="meta">签认、入库、提交按闸门来。没过线的候选停在房间里。</p></div>
+    </div>`;
+}
+const views={room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,audio:viewAudio,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
+function bind(){
+  const v=$("#view");
+  v.onclick=e=>{
+    const t=e.target;
+    if(t.dataset.t){state.tab=t.dataset.t;render()}
+    if(t.dataset.r!=null){state.role=+t.dataset.r;state.playing=false;if(!ROLES[state.role].anims.includes(state.dir))state.dir=ROLES[state.role].anims[0];render()}
+    if(t.dataset.s!=null){state.scene=+t.dataset.s;render()}
+    if(t.dataset.a!=null){state.audio=+t.dataset.a;state.aud=false;render()}
+    if(t.dataset.q!=null){state.quest=+t.dataset.q;render()}
+    if(t.dataset.qt){state.qtab=t.dataset.qt;render()}
+    if(t.dataset.d!=null){state.dom=+t.dataset.d;render()}
+    if(t.dataset.open){toast("打开现行手册："+t.dataset.open);logs.unshift("打开手册 "+t.dataset.open)}
+    if(t.id==="play"){state.playing=!state.playing;render()}
+    if(t.id==="aud"){state.aud=!state.aud;render()}
+    if(t.id==="run"){toast("已生成制作执行单，等待四道闸门");logs.unshift("制作执行单 · "+state.view)}
+    if(t.id==="saveq"){toast("源文本已校验，未直接发布");}
+    if(t.id==="ref"){toast("已按单一数据源重新盘点")}
+    if(t.id==="lockd"){toast("已定位领域与上下游，未改文件")}
+    if(t.id==="seediff"){state.diff=!state.diff;render()}
+    if(t.id==="refreshc"){toast("提交卡已刷新");logs.unshift("刷新提交卡")}
+    if(t.id==="recheck"){state.phase=-1;toast("闸门已重跑");render()}
+    const whoBtn=t.closest&&t.closest("[data-who]");
+    if(whoBtn){state.focus=whoBtn.dataset.who;render()}
+    if(t.id==="think"){state.thinkOn=!state.thinkOn;render()}
+    if(t.id==="tocrew"){state.view="crew";render()}
+    if(t.id==="send"){sendRoom()}
+    if(t.id==="sign"){
+      if(state.signed){toast("这张卡已经签认");return}
+      state.signed=true;
+      state.msgs.push({who:"制作人",kind:"human",text:"S096 用户签认。版本 Agent 只提交 wool.gd、grappling_feature.gd、jump.png 和 level_1.tscn。"});
+      logs.unshift("真人签认 S096 · Wool");
+      toast("已签认，版本 Agent 可以提交");
+      render();
+    }
+    if(t.id==="askrepo"){state.draft="@版本 提交本轮已签认的差量";sendRoom()}
+    if(t.id==="doCommit"){
+      const msg=($("#msg")||{}).value||"";
+      if(!msg.trim()){toast("提交说明不能为空");return}
+      state.phase=0;render();
+      let i=0;const timer=setInterval(()=>{i++;state.phase=i;render();if(i>=4){clearInterval(timer);toast("提交完成 r290，历史已归档");logs.unshift("提交完成 r290 · "+msg)}},700);
+    }
+  };
+  const sq=$("#sq"); if(sq) sq.oninput=e=>{state.q=e.target.value;render();$("#sq").focus()};
+  const sf=$("#sf"); if(sf) sf.onchange=e=>{state.fst=e.target.value;render()};
+  const dir=$("#dir"); if(dir) dir.onchange=e=>{state.dir=e.target.value;render()};
+  const bq=$("#bq"); if(bq) bq.oninput=e=>{state.bookQ=e.target.value;render();$("#bq").focus()};
+  const bd=$("#bd"); if(bd) bd.onchange=e=>{state.bookD=e.target.value;render()};
+  const say=$("#say");
+  if(say){
+    say.oninput=e=>{state.draft=e.target.value};
+    say.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendRoom()}};
+  }
+  const th=document.querySelector(".thread");
+  if(th) th.scrollTop=th.scrollHeight;
+  const clip=document.getElementById("clip");
+  if(clip&&state.aud){clip.play().catch(()=>toast("浏览器没有播放这个文件"));}
+}
+function render(){
+  nav();
+  $("#view").innerHTML=views[state.view]();
+  bind();
+  $("#log").innerHTML="<b>生产日志</b><ul>"+logs.slice(0,8).map(x=>`<li>${esc(x)}</li>`).join("")+"</ul>";
+  $("#log").classList.toggle("show",state.logOn);
+}
+$("#theme").onclick=()=>{document.body.classList.toggle("dark");$("#theme").textContent=document.body.classList.contains("dark")?"亮色":"暗色"};
+$("#logBtn").onclick=()=>{state.logOn=!state.logOn;$("#log").classList.toggle("show",state.logOn)};
+render();
+</script>
+</body>
+</html>

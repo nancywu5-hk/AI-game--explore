@@ -1,0 +1,102 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/review_prompt.gd" id="1_script"]
+[ext_resource type="PackedScene" uid="uid://rcr5v5hlcmya" path="res://scenes/ui/menu_background.tscn" id="2_menu_bg"]
+[ext_resource type="Theme" uid="uid://dfh80kxu23rvv" path="res://assets/ui/pause_theme.tres" id="3_theme"]
+
+[node name="ReviewPrompt" type="CanvasLayer"]
+process_mode = 3
+layer = 300
+script = ExtResource("1_script")
+
+[node name="Control" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("3_theme")
+
+[node name="ColorRect" type="ColorRect" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.4392157, 0.40784314, 0.5294118, 0.5)
+
+[node name="OuterMargin" type="MarginContainer" parent="Control"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 120
+theme_override_constants/margin_top = 120
+theme_override_constants/margin_right = 120
+theme_override_constants/margin_bottom = 120
+
+[node name="CenterContainer" type="CenterContainer" parent="Control/OuterMargin"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Panel" type="MarginContainer" parent="Control/OuterMargin/CenterContainer"]
+custom_minimum_size = Vector2(640, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/margin_left = 56
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 56
+theme_override_constants/margin_bottom = 48
+
+[node name="MenuBackground" parent="Control/OuterMargin/CenterContainer/Panel" instance=ExtResource("2_menu_bg")]
+layout_mode = 1
+
+[node name="ContentMargin" type="MarginContainer" parent="Control/OuterMargin/CenterContainer/Panel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 48
+theme_override_constants/margin_top = 48
+theme_override_constants/margin_right = 48
+theme_override_constants/margin_bottom = 40
+
+[node name="Content" type="VBoxContainer" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 32
+
+[node name="TitleLabel" type="Label" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/Content"]
+layout_mode = 2
+mouse_filter = 2
+text = "Enjoying Wool?"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="BodyLabel" type="Label" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/Content"]
+layout_mode = 2
+mouse_filter = 2
+text = "A quick rating helps a lot."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Buttons" type="HBoxContainer" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/Content"]
+layout_mode = 2
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = 32
+
+[node name="LaterButton" type="Button" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/Content/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Later"
+
+[node name="RateButton" type="Button" parent="Control/OuterMargin/CenterContainer/Panel/ContentMargin/Content/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Rate"

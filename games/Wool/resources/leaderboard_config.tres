@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="LeaderboardConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/leaderboard/leaderboard_config.gd" id="1_config"]
+
+[resource]
+script = ExtResource("1_config")
+project_id = "wool-leaderboard"
+api_key = "AIzaSyB4Mk-uvOmJ7C85K5SVwYeY411J5xX0vjQ"
+collection = "scores"
+top_limit = 50
+cache_seconds = 120

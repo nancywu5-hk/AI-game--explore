@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://dyc68xp3u5p3y"]
+
+[ext_resource type="Script" uid="uid://bdllnt34naubf" path="res://scripts/interactions/nail.gd" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://cfs0l7era8v3o" path="res://assets/map/nails/normal-back.png" id="2_3v4ee"]
+[ext_resource type="Texture2D" uid="uid://b6tqop7f1xqj1" path="res://assets/map/nails/normal-front.png" id="3_qgxsr"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_detection"]
+radius = 159.39886
+
+[node name="Nail" type="Area2D"]
+collision_layer = 4
+collision_mask = 2
+script = ExtResource("1_script")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_detection")
+
+[node name="ShadowSprite" type="Sprite2D" parent="."]
+z_index = -2
+position = Vector2(10, 10)
+texture = ExtResource("2_3v4ee")
+modulate = Color(0, 0, 0, 0.8)
+
+[node name="BackSprite" type="Sprite2D" parent="."]
+z_index = -1
+texture = ExtResource("2_3v4ee")
+
+[node name="FrontSprite" type="Sprite2D" parent="."]
+z_index = 1
+texture = ExtResource("3_qgxsr")
+
+[node name="GrapplePoint" type="Marker2D" parent="."]

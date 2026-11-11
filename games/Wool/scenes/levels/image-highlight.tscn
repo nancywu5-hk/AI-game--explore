@@ -1,0 +1,51 @@
+[gd_scene load_steps=6 format=3 uid="uid://dn5ggmxlg7f6r"]
+
+[ext_resource type="Texture2D" uid="uid://nq2y5o4kx5ss" path="res://assets/map/background.png" id="1_fpj1j"]
+[ext_resource type="PackedScene" uid="uid://dyc68xp3u5p3y" path="res://scenes/interactions/nail.tscn" id="2_spw72"]
+[ext_resource type="Texture2D" uid="uid://bygvsfk6jg01t" path="res://assets/character/spucki/spucki-platform.png" id="3_qvtxs"]
+[ext_resource type="PackedScene" uid="uid://b6ta6xfdcfr3h" path="res://scenes/characters/players/wool.tscn" id="4_wgsiv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ra442"]
+size = Vector2(632, 224)
+
+[node name="Node2D" type="Node2D"]
+position = Vector2(-728, 568)
+scale = Vector2(2, 2)
+
+[node name="Background" type="Sprite2D" parent="."]
+visible = false
+z_index = -20
+position = Vector2(1032, -568)
+texture = ExtResource("1_fpj1j")
+
+[node name="Nail9" parent="." instance=ExtResource("2_spw72")]
+position = Vector2(1004, -675)
+
+[node name="Nail5" parent="." instance=ExtResource("2_spw72")]
+position = Vector2(1100, -675)
+
+[node name="Nail7" parent="." instance=ExtResource("2_spw72")]
+position = Vector2(1150, -550)
+
+[node name="Nail8" parent="." instance=ExtResource("2_spw72")]
+position = Vector2(850, -550)
+
+[node name="Nail6" parent="." instance=ExtResource("2_spw72")]
+position = Vector2(900, -675)
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="StartPlatform" type="StaticBody2D" parent="Platforms"]
+position = Vector2(808, -210)
+
+[node name="platform" type="Sprite2D" parent="Platforms/StartPlatform"]
+modulate = Color(1.3, 1.3, 1.3, 1)
+position = Vector2(184, -122)
+texture = ExtResource("3_qvtxs")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/StartPlatform"]
+position = Vector2(182, -135)
+shape = SubResource("RectangleShape2D_ra442")
+
+[node name="Wool" parent="." instance=ExtResource("4_wgsiv")]
+position = Vector2(1000, -500)

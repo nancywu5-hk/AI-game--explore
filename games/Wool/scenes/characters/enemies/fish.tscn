@@ -1,0 +1,122 @@
+[gd_scene format=3 uid="uid://dgl3qoynkddvj"]
+
+[ext_resource type="PackedScene" uid="uid://bkumxcivwme5k" path="res://scenes/characters/enemies/base-enemy.tscn" id="1_base_enemy"]
+[ext_resource type="Script" uid="uid://cxhwad2ddre17" path="res://scripts/characters/fish.gd" id="2_script"]
+[ext_resource type="Texture2D" uid="uid://c0cek7qo2d07p" path="res://assets/character/fish/fish.png" id="3_cg1ll"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cg1ll"]
+size = Vector2(2008, 1169)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_obdji"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(0, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e65mj"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(256, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a24j4"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(512, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hr14i"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(768, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jjw0g"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(1024, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hfu4c"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(1280, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_b3v0o"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(1536, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_vhqih"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(1792, 0, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y154x"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(0, 185, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7ywt0"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(256, 185, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hpmb1"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(512, 185, 256, 185)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_n134e"]
+atlas = ExtResource("3_cg1ll")
+region = Rect2(768, 185, 256, 185)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_e65mj"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_obdji")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e65mj")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a24j4")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hr14i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jjw0g")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hfu4c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_b3v0o")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_vhqih")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y154x")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7ywt0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hpmb1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_n134e")
+}],
+"loop": true,
+"name": &"default",
+"speed": 25.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_e65mj"]
+size = Vector2(2011.75, 1173.5)
+
+[node name="Fish" unique_id=952113560 instance=ExtResource("1_base_enemy")]
+scale = Vector2(0.075, 0.075)
+script = ExtResource("2_script")
+horizontal_speed = -900.0
+
+[node name="PhysicsShape" parent="." index="0"]
+position = Vector2(40, 79.5)
+shape = SubResource("RectangleShape2D_cg1ll")
+
+[node name="AnimatedSprite2D" parent="Skin" index="0"]
+position = Vector2(390, 170.00002)
+scale = Vector2(17, 17)
+sprite_frames = SubResource("SpriteFrames_e65mj")
+autoplay = "default"
+
+[node name="HitboxShape" parent="HitboxArea" index="0"]
+position = Vector2(40.125, 79.25)
+shape = SubResource("RectangleShape2D_e65mj")

@@ -1,0 +1,26 @@
+[gd_resource type="Theme" format=3 uid="uid://d3xsdcms6qxxe"]
+
+[ext_resource type="Texture2D" uid="uid://d1krmngeqewh7" path="res://assets/ui/button.png" id="2_btn_bg"]
+[ext_resource type="FontFile" uid="uid://27boy1fh8ft2" path="res://assets/font/Super-Naive.ttf" id="2_mei1i"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_btn"]
+content_margin_left = 40.0
+content_margin_top = 20.0
+content_margin_right = 40.0
+content_margin_bottom = 20.0
+texture = ExtResource("2_btn_bg")
+
+[resource]
+default_font = ExtResource("2_mei1i")
+default_font_size = 32
+Button/colors/font_color = Color(0, 0, 0, 1)
+Button/colors/font_focus_color = Color(0, 0, 0, 1)
+Button/colors/font_hover_color = Color(0, 0, 0, 1)
+Button/colors/font_pressed_color = Color(0, 0, 0, 1)
+Button/styles/disabled = SubResource("StyleBoxTexture_btn")
+Button/styles/focus = SubResource("StyleBoxTexture_btn")
+Button/styles/hover = SubResource("StyleBoxTexture_btn")
+Button/styles/normal = SubResource("StyleBoxTexture_btn")
+Button/styles/pressed = SubResource("StyleBoxTexture_btn")
+Label/colors/font_color = Color(0, 0, 0, 1)
+TitleLabel/base_type = &"Label"
