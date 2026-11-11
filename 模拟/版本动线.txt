@@ -494,3 +494,4 @@
 代码资产｜老鹰按距离出生｜code/play｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 合并｜解冲突后合并进主线｜main｜scenes/characters/enemies/plant.tscn｜已解决｜-｜冲突已经人工选边，主线只留一份。
 美术资产｜用行走表替换黄块｜art/blockout｜assets/sound/wool/hook.wav｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜搭白模地面｜code/play｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
