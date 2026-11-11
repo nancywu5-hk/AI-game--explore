@@ -50,6 +50,24 @@ func _ready() -> void:
 		_initial_pickaxe_centered = pickaxe.centered
 		_initial_pickaxe_offset = pickaxe.offset
 
+	_apply_active_skin()
+
+func _apply_active_skin() -> void:
+	var path := "res://resources/skins/active_skin.json"
+	if not FileAccess.file_exists(path):
+		return
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return
+	var parsed = JSON.parse_string(file.get_as_text())
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var tint := Color.html(str(parsed.get("tint", "#ffffff")))
+	if skin and skin.animated_sprite:
+		skin.animated_sprite.modulate = tint
+	if pickaxe:
+		pickaxe.modulate = tint
+
 func _process(delta: float) -> void:
 	super._process(delta)
 

@@ -307,6 +307,8 @@ func die() -> void:
 func _apply_skin() -> void:
 	if skin and skin_resource and skin_resource.texture:
 		skin.set_texture(skin_resource.texture)
+	if skin and skin.animated_sprite and skin_resource:
+		skin.animated_sprite.modulate = skin_resource.tint
 
 ## Setup default air terrain for energy loss
 func _setup_default_air_terrain() -> void:

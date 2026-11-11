@@ -7,3 +7,4 @@
 script = ExtResource("1_script")
 skin_name = "Wool"
 texture = ExtResource("2_tex")
+tint = Color(0.4941, 0.7137, 1.0000, 1)

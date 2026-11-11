@@ -72,6 +72,11 @@ body.dark .preview{background:linear-gradient(180deg,#242038,#1b2030)}
 .fig{width:120px;height:180px}
 .sprite{max-width:220px;max-height:200px;image-rendering:pixelated;object-fit:contain}
 .sprite.run{animation:bob .55s ease-in-out infinite}
+.stage{width:260px;height:260px;display:grid;place-items:center;background:radial-gradient(circle at 50% 72%, #3d5270, #1c2434 72%);border-radius:16px}
+canvas.woolc{width:220px;height:220px;image-rendering:pixelated}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.swatch{width:34px;height:34px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.swatch.on{box-shadow:0 0 0 2px var(--accent)}
 @keyframes bob{50%{transform:translateY(-8px)}}
 .play{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:8px}
 .bar{height:6px;background:#ddd8f5;border-radius:99px;flex:1;overflow:hidden}
@@ -168,6 +173,7 @@ body.dark .bubble.human{background:#1d2740}
 <script>
 const NAV=[
   {g:"协作",items:[
+    ["skin","换皮肤"],
     ["room","联机房间"],
     ["crew","成员与模型"],
     ["board","交接与版本"]
@@ -190,6 +196,60 @@ const NAV=[
   ]}
 ];
 const GAME={name:"Wool",upstream:"https://github.com/EliasSteffen/Wool",license:"MIT",src:"../games/Wool/"};
+const FRAMES={"idle":{"file":"idle.png","fps":15,"frames":[[0,0,256,144],[256,0,256,144],[512,0,256,144],[768,0,256,144],[1024,0,256,144],[1280,0,256,144],[1536,0,256,144],[1792,0,256,144],[0,144,256,144],[256,144,256,144],[512,144,256,144],[768,144,256,144],[1024,144,256,144],[1280,144,256,144],[1536,144,256,144],[1792,144,256,144],[0,288,256,144],[256,288,256,144],[512,288,256,144],[768,288,256,144],[1024,288,256,144],[1280,288,256,144],[1536,288,256,144],[1792,288,256,144],[0,432,256,144],[256,432,256,144],[512,432,256,144],[768,432,256,144],[1024,432,256,144]]},"walk":{"file":"walk.png","fps":30,"frames":[[0,0,256,144],[256,0,256,144],[512,0,256,144],[768,0,256,144],[1024,0,256,144],[1280,0,256,144],[1536,0,256,144],[1792,0,256,144],[0,144,256,144],[256,144,256,144],[512,144,256,144],[768,144,256,144],[1024,144,256,144],[1280,144,256,144],[1536,144,256,144],[1792,144,256,144]]},"jump":{"file":"jump.png","fps":30,"frames":[[0,0,256,256],[256,0,256,256],[512,0,256,256],[768,0,256,256],[1024,0,256,256],[1280,0,256,256],[1536,0,256,256],[1792,0,256,256],[0,256,256,256],[256,256,256,256],[512,256,256,256],[768,256,256,256],[1024,256,256,256],[1280,256,256,256],[1536,256,256,256],[1792,256,256,256],[0,512,256,256],[256,512,256,256],[512,512,256,256],[768,512,256,256],[1024,512,256,256],[1280,512,256,256],[1536,512,256,256],[1792,512,256,256],[0,768,256,256]]},"grapple_cw":{"file":"swing.png","fps":25,"frames":[[0,0,256,256],[256,0,256,256],[512,0,256,256],[768,0,256,256],[1024,0,256,256],[1280,0,256,256],[1536,0,256,256],[1792,0,256,256],[0,256,256,256],[256,256,256,256],[512,256,256,256],[768,256,256,256],[1024,256,256,256],[1280,256,256,256],[1536,256,256,256],[1792,256,256,256],[0,512,256,256],[256,512,256,256],[512,512,256,256]]}};
+const SKINS=[{id:"wool",name:"原毛",tint:"#ffffff"},{id:"night",name:"夜蓝",tint:"#7eb6ff"},{id:"gold",name:"赤金",tint:"#f0c36a"},{id:"berry",name:"莓红",tint:"#f08aa4"},{id:"moss",name:"森绿",tint:"#7dcea0"}];
+const sheetCache={};
+function clipOf(name){return name==="swing"?"grapple_cw":(FRAMES[name]?name:"idle")}
+function frameImg(clip,index){
+  const key=clip+"/"+index;
+  if(!sheetCache[key]){
+    const im=new Image();
+    im.src="wool-frames/"+clip+"/"+index+".png";
+    sheetCache[key]=im;
+  }
+  return sheetCache[key];
+}
+function currentSkin(){return SKINS.find(s=>s.id===state.skinId)||SKINS[0]}
+function paintWool(canvas){
+  const name=clipOf(state.dir);
+  const spec=FRAMES[name];
+  const index=state.woolFrame%spec.frames.length;
+  const img=frameImg(name,index);
+  const ctx=canvas.getContext("2d");
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.globalCompositeOperation="source-over";
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!img.complete||!img.naturalWidth) return;
+  const scale=Math.min(canvas.width/img.naturalWidth, canvas.height/img.naturalHeight);
+  const w=img.naturalWidth*scale, h=img.naturalHeight*scale, x=(canvas.width-w)/2, y=(canvas.height-h)/2;
+  ctx.drawImage(img, x, y, w, h);
+  const tint=currentSkin().tint;
+  if(tint!=="#ffffff"){
+    ctx.globalCompositeOperation="multiply";
+    ctx.fillStyle=tint;
+    ctx.fillRect(x,y,w,h);
+    ctx.globalCompositeOperation="destination-in";
+    ctx.drawImage(img, x, y, w, h);
+    ctx.globalCompositeOperation="source-over";
+  }
+}
+let lastTs=0;
+function tickWool(ts){
+  const dt=lastTs?(ts-lastTs)/1000:0;
+  lastTs=ts;
+  const spec=FRAMES[clipOf(state.dir)];
+  if(state.playing){
+    state.acc+=dt*spec.fps;
+    if(state.acc>=1){
+      state.woolFrame=(state.woolFrame+Math.floor(state.acc))%spec.frames.length;
+      state.acc%=1;
+      const label=document.getElementById("frameno");
+      if(label) label.textContent=(state.woolFrame+1)+" / "+spec.frames.length;
+    }
+  }
+  document.querySelectorAll("canvas.woolc").forEach(paintWool);
+  requestAnimationFrame(tickWool);
+}
 const SPRINTS=[
   {id:"S096",title:"钩爪绳长与 Wool 跳跃不同步",ver:"scripts/features/grappling_feature.gd",st:"待验收",plan:"当前",body:"本卡只改钩爪绳长动画和 Wool 的 jump 循环。不改钉子碰撞，不改排行榜。",checks:["jump 动画不循环，见 wool.gd 的 set_animation_loop","绳长动画速度仍是 800 px/s，改动要写回本卡","未签认前不提交 scenes/levels/level_1.tscn"]},
   {id:"S118",title:"Wool / Eagle / Fish 精灵登记",ver:"assets/character",st:"待验收",plan:"当前",body:"角色流程只认仓库里已有的精灵表，不另造一套帧。",checks:["Wool 有 idle、walk、jump、swing","Eagle 只有 fly.png","Fish 使用 fish.png，不借用 Wool 的表"]},
@@ -267,7 +327,7 @@ const CREW=[
   {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"核验模型",wake:"仅 @唤起"},
   {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"版控模型",wake:"仅 @唤起"}
 ];
-const state={view:"room",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"idle",playing:false,quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,
+const state={view:"skin",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"walk",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,
   signed:false,artVer:2,repo:"等待签认",thinkOn:false,draft:"",waiting:false,focus:"美术",
   msgs:[
     {who:"制作人",kind:"human",text:"@PM S096。只核对 Wool 的 jump 循环和 grappling_feature.gd 的绳长。不要改 level_1 的钉子碰撞，也不要自己提交。"},
@@ -295,9 +355,29 @@ function gates(){
     <div class="gate"><span class="pill">尚未解锁</span><b>用户签认</b>原作者事实记录。本轮验收不由执行者自己闭环。</div>
   </div><p class="note">这四道是放行闸门。事实记在来源里。人工闸门不通过，就不放行。</p>`;
 }
+function woolStage(){
+  const spec=FRAMES[clipOf(state.dir)];
+  return `<div class="stage"><canvas class="woolc" width="256" height="256"></canvas></div><div class="meta" id="frameno" style="text-align:center;margin-top:6px">${(state.woolFrame%spec.frames.length)+1} / ${spec.frames.length} · ${esc(currentSkin().name)}</div>`;
+}
 function sprite(role,anim){
+  if(role.id==="wool") return woolStage();
   const file=(role.sheet&&role.sheet[anim])||Object.values(role.sheet||{})[0];
-  return `<img class="sprite ${state.playing?"run":""}" alt="${esc(role.name)}" src="${GAME.src}${file}">`;
+  return `<img class="sprite" alt="${esc(role.name)}" src="${GAME.src}${file}">`;
+}
+function viewSkin(){
+  const skin=currentSkin();
+  const clips=[["idle","待机"],["walk","行走"],["jump","跳跃"],["swing","摆荡"]];
+  return `<h1 class="h1">换皮肤</h1><p class="lead">按 Wool 精灵表的格子逐帧播放。选一个颜色，写进游戏启动时读取的皮肤文件。</p>
+    <div class="split"><div class="card" style="padding:14px"><div class="preview" style="background:#1c2434">${woolStage()}</div>
+      <div class="play"><button class="ghost" id="play">${state.playing?"暂停":"播放"}</button>
+        ${clips.map(([id,name])=>`<button class="ghost ${state.dir===id?"on":""}" data-clip="${id}">${name}</button>`).join("")}</div>
+      <p class="note">帧来自 wool.tscn 里的 AtlasTexture。待机 15 帧/秒，行走和跳跃 30，摆荡 25。</p></div>
+    <div class="card" style="padding:14px"><h4>皮肤</h4>
+      <div class="swatches">${SKINS.map(s=>`<button class="swatch ${s.id===state.skinId?"on":""}" data-skin="${s.id}" title="${esc(s.name)}" style="background:${s.tint}"></button>`).join("")}</div>
+      <p style="margin-top:12px"><b>${esc(skin.name)}</b> <span class="meta">${skin.tint}</span></p>
+      <p class="note">颜色乘在当前帧上。原毛保持原图。应用到游戏后，wool.gd 在启动时读取 resources/skins/active_skin.json，角色和镐子一起染色。</p>
+      <div class="btnrow"><button class="pri" id="applyskin">应用到游戏</button></div>
+      <p class="note">${esc(state.skinMsg||"预览已经跟着当前颜色走。点应用到游戏后写入 Wool。")}</p></div></div>`;
 }
 function viewSprint(){
   const list=SPRINTS.filter(s=>s.plan===(state.tab==="当前"?"当前":state.tab==="历史"?"历史":s.plan))
@@ -475,8 +555,8 @@ function viewRoom(){
         <p class="note">当前焦点 ${esc(me.name)}：${esc(me.duty)}</p>
       </div>
       <div class="card" style="padding:12px">
-        <b>S096 · Wool jump</b>
-        <div class="preview" style="margin:10px 0;min-height:160px"><img class="sprite ${state.playing?"run":""}" alt="Wool jump" src="${GAME.src}assets/character/wool/jump.png"></div>
+        <b>Wool · 当前皮肤</b>
+        <div class="preview" style="margin:10px 0;min-height:160px;background:#1c2434">${woolStage()}</div>
         <div class="kv"><span>脚本</span><b>wool.gd</b><span>钩爪</span><b>grappling_feature.gd</b><span>签认</span><b>${state.signed?"已签认":"未签认"}</b><span>仓库</span><b>${esc(state.repo)}</b></div>
         <div class="btnrow" style="margin-top:10px"><button class="pri" id="sign">${state.signed?"已签认":"真人签认"}</button><button class="ghost" id="askrepo">让版本提交</button></div>
         <p class="note">共同审阅在这里完成。版本 Agent 看见签认之后，才把差量写入存档仓库。</p>
@@ -509,13 +589,16 @@ function viewBoard(){
       <div class="stat"><b>串行集成</b><p class="meta">签认、入库、提交按闸门来。没过线的候选停在房间里。</p></div>
     </div>`;
 }
-const views={room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,audio:viewAudio,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
+const views={skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,audio:viewAudio,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
 function bind(){
   const v=$("#view");
   v.onclick=e=>{
     const t=e.target;
     if(t.dataset.t){state.tab=t.dataset.t;render()}
-    if(t.dataset.r!=null){state.role=+t.dataset.r;state.playing=false;if(!ROLES[state.role].anims.includes(state.dir))state.dir=ROLES[state.role].anims[0];render()}
+    if(t.dataset.r!=null){state.role=+t.dataset.r;if(!ROLES[state.role].anims.includes(state.dir)){state.dir=ROLES[state.role].anims[0];state.woolFrame=0;state.acc=0}render()}
+    if(t.dataset.clip){state.dir=t.dataset.clip;state.woolFrame=0;state.acc=0;render()}
+    if(t.dataset.skin){state.skinId=t.dataset.skin;render()}
+    if(t.id==="applyskin"){applySkin()}
     if(t.dataset.s!=null){state.scene=+t.dataset.s;render()}
     if(t.dataset.a!=null){state.audio=+t.dataset.a;state.aud=false;render()}
     if(t.dataset.q!=null){state.quest=+t.dataset.q;render()}
@@ -554,7 +637,7 @@ function bind(){
   };
   const sq=$("#sq"); if(sq) sq.oninput=e=>{state.q=e.target.value;render();$("#sq").focus()};
   const sf=$("#sf"); if(sf) sf.onchange=e=>{state.fst=e.target.value;render()};
-  const dir=$("#dir"); if(dir) dir.onchange=e=>{state.dir=e.target.value;render()};
+  const dir=$("#dir"); if(dir) dir.onchange=e=>{state.dir=e.target.value;state.woolFrame=0;state.acc=0;render()};
   const bq=$("#bq"); if(bq) bq.oninput=e=>{state.bookQ=e.target.value;render();$("#bq").focus()};
   const bd=$("#bd"); if(bd) bd.onchange=e=>{state.bookD=e.target.value;render()};
   const say=$("#say");
@@ -574,9 +657,29 @@ function render(){
   $("#log").innerHTML="<b>生产日志</b><ul>"+logs.slice(0,8).map(x=>`<li>${esc(x)}</li>`).join("")+"</ul>";
   $("#log").classList.toggle("show",state.logOn);
 }
+async function applySkin(){
+  const skin=currentSkin();
+  try{
+    const r=await fetch("/api/skin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:skin.id,name:skin.name,tint:skin.tint})});
+    if(!r.ok) throw new Error("http");
+    state.skinMsg="已写入 games/Wool/resources/skins/active_skin.json，并同步 wool_skin.tres。下次运行 Wool，角色和镐子会染成"+skin.name+"。";
+    toast("皮肤已写入 Wool");
+    logs.unshift("换皮肤 "+skin.name+" "+skin.tint);
+  }catch(err){
+    state.skinMsg="预览已换成"+skin.name+"。当前页面没有连上工作台服务，游戏文件还没改。请用 games/Wool/tools/workbench_server.py 打开后再点一次。";
+    toast("预览已换色，游戏文件未写入");
+  }
+  render();
+}
 $("#theme").onclick=()=>{document.body.classList.toggle("dark");$("#theme").textContent=document.body.classList.contains("dark")?"亮色":"暗色"};
 $("#logBtn").onclick=()=>{state.logOn=!state.logOn;$("#log").classList.toggle("show",state.logOn)};
 render();
+requestAnimationFrame(tickWool);
+fetch(GAME.src+"resources/skins/active_skin.json").then(r=>r.ok?r.json():null).then(data=>{
+  if(!data) return;
+  const found=SKINS.find(s=>s.id===data.id);
+  if(found&&found.id!==state.skinId){state.skinId=found.id;render();}
+}).catch(()=>{});
 </script>
 </body>
 </html>
