@@ -629,3 +629,4 @@
 美术资产｜启动画面接入｜art/blockout｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜小精灵用黄块占位｜code/play｜scripts/features/grappling_feature.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜跳跃先接上｜code/play｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
+美术资产｜小精灵比例草图，先不进主线｜art/blockout｜assets/character/wool/walk.png｜已提交｜-｜只动美术文件，不改玩法脚本。
