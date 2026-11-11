@@ -709,3 +709,4 @@
 美术资产｜启动画面接入｜art/blockout｜assets/character/wool/jump.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜钩爪可以甩到铆钉｜code/play｜scripts/levels/enemy_spawner.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜普通铆钉用橙圈｜code/play｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
+美术资产｜小精灵比例草图，先不进主线｜art/blockout｜assets/character/spucki/pflanze.png｜已提交｜-｜只动美术文件，不改玩法脚本。
