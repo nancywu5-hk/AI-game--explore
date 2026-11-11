@@ -173,6 +173,11 @@ body.dark .bubble.human{background:#1d2740}
 <input id="upfile" type="file" hidden>
 <script>
 const NAV=[
+  {g:"协作",items:[
+    ["room","联机房间"],
+    ["crew","成员与模型"],
+    ["board","交接与版本"]
+  ]},
   {g:"资产",items:[
     ["art","美术资产"],
     ["audio","音效资产"]
@@ -311,14 +316,14 @@ const CREW=[
   {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"核验模型",wake:"仅 @唤起"},
   {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"版控模型",wake:"仅 @唤起"}
 ];
-const state={view:"art",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"walk",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
+const state={view:"room",tab:"当前",q:"",fst:"全部",role:0,scene:2,dir:"walk",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
   signed:false,artVer:2,repo:"等待签认",thinkOn:false,draft:"",waiting:false,focus:"美术",
   msgs:[
-    {who:"制作人",kind:"human",text:"@PM S096。只核对 Wool 的 jump 循环和 grappling_feature.gd 的绳长。不要改 level_1 的钉子碰撞，也不要自己提交。"},
-    {who:"PM",kind:"ai",model:"分派",think:"卡上写了不做什么。看精灵和看脚本可以并行，提交必须等人签认。",text:"已钉在 S096。@美术 对照 assets/character/wool 的四张表。@场景 只读 scenes/levels/level_1.tscn。@版本 在签认前不要动仓库。"},
-    {who:"美术",kind:"ai",model:"出图",think:"仓库里已有 idle、walk、jump、swing。我只核对，不另存一套。",text:"Wool 四张精灵表都在 assets/character/wool。jump.png 对应脚本里关掉循环的那条动画。",artifact:"jump.png"},
-    {who:"美术复核",kind:"human",text:"jump 表可以用。不要把 Eagle 的 fly.png 套到 Wool 上。"},
-    {who:"场景",kind:"ai",model:"核验",think:"主场景路径以 project.godot 为准。",text:"run/main_scene 仍是 res://scenes/levels/level_1.tscn。钉子场景 nail.tscn、boost_nail.tscn、rusty_nail.tscn 都在，碰撞脚本没有新差异。"}
+    {who:"制作人",kind:"human",text:"@PM 这轮只替换美术和音效。美术和场景可以同时看，版本 Agent 在我签认前不要提交。"},
+    {who:"PM",kind:"ai",model:"分派",think:"出图和核验可以并行。写入 GitHub 必须等人签认。",text:"已钉住这轮。@美术 只在房间里给出候选，不自己入库。@场景 核对这批资源能不能放进关卡。@版本 签认前不要推仓库。"},
+    {who:"美术",kind:"ai",model:"出图",think:"我只产候选。正式文件要等人点头。",text:"候选放在房间右侧。要替换就去美术资产或音效资产，上传后仍停在待提交。",artifact:"候选图"},
+    {who:"美术复核",kind:"human",text:"先看候选。不满意就退回，不要直接推进仓库。"},
+    {who:"场景",kind:"ai",model:"核验",think:"我只核对，不改文件。",text:"场景这边可以和出图同时进行。尺寸和命名对上之后，再等制作人签认。"}
   ]};
 const logs=["工作台只接收本地上传的美术和音效","提交会推送到 nancywu5-hk/AI-game--explore"];
 function $(s){return document.querySelector(s)}
@@ -326,7 +331,7 @@ function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");se
 function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
 function nav(){
   $("#nav").innerHTML=NAV.map(g=>`<div class="nav-g">${g.g}</div>`+g.items.map(([id,name])=>`<button data-v="${id}" class="${state.view===id?"on":""}">${name}</button>`).join("")).join("");
-  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.view=b.dataset.v;render();if(state.view==="art"||state.view==="audio"||state.view==="commit")loadRepo()};
+  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;state.view=b.dataset.v;render();if(["room","art","audio","commit","board"].includes(state.view))loadRepo()};
 }
 function steps(names,on=0){
   return `<div class="steps">${names.map((n,i)=>`<div class="step ${i===on?"on":""}"><b>0${i+1}</b>${n}</div>`).join("")}</div>`;
@@ -517,16 +522,16 @@ function viewCommit(){
 function replyTo(text){
   const hit=name=>text.includes("@"+name);
   const out=[];
-  if(hit("PM")) out.push({who:"PM",kind:"ai",model:"分派",think:"先看 S096 的范围。看精灵和读关卡可以并行，提交必须串行。",text:"仍钉在 S096。美术和场景可以同时做。版本 Agent 在签认前不碰 games/Wool。"});
-  if(hit("美术")){state.artVer++;out.push({who:"美术",kind:"ai",model:"出图",think:"只切换仓库里已有的表，不另存新图。",text:"已再对一遍 assets/character/wool。Eagle 的 fly.png 没有套到 Wool 上。",artifact:"jump.png"});}
-  if(hit("场景")) out.push({who:"场景",kind:"ai",model:"核验",think:"以 project.godot 的 main_scene 为准。",text:"level_1.tscn 没有新差异。钉子三个场景都在，碰撞脚本未改。"});
+  if(hit("PM")) out.push({who:"PM",kind:"ai",model:"分派",think:"出图和核验并行，签认和推送串行。",text:"美术和场景可以同时做。版本 Agent 在签认前不推 https://github.com/nancywu5-hk/AI-game--explore 。"});
+  if(hit("美术")){state.artVer++;out.push({who:"美术",kind:"ai",model:"出图",think:"我只给候选，不自己按提交。",text:"候选仍停在房间。要换文件，去美术资产上传，上传不等于入库。",artifact:"候选图"});}
+  if(hit("场景")) out.push({who:"场景",kind:"ai",model:"核验",think:"我核对资源能不能进关卡，不写仓库。",text:"这批美术和音效可以同时核。命名和时长对上之前，不建议签认。"});
   if(hit("版本")){
-    if(!state.signed) out.push({who:"版本",kind:"ai",model:"版控",think:"闸门未过。现在提交会把未签认的 wool.gd 写进存档仓库。",text:"先不提交。S096 还差用户签认。hook-2.wav 还没登记进 audio_manager.gd，这轮也不带上。"});
-    else if(state.repo==="已提交") out.push({who:"版本",kind:"ai",model:"版控",text:"这一轮已经记入存档。没有新的文件差异，不重复提交。"});
-    else {state.repo="已提交";out.push({who:"版本",kind:"ai",model:"版控",think:"只提交本卡列出的脚本和精灵。hook-2.wav 未登记，跳过。",text:"已把 S096 的差量准备好：wool.gd、grappling_feature.gd、jump.png、level_1.tscn。未登记的 hook-2.wav 没有放进去。"});}
+    if(!state.signed) out.push({who:"版本",kind:"ai",model:"版控",think:"闸门未过。现在推送会把未签认的资产写进仓库。",text:"先不提交。还差制作人签认。我不会自己开分支，也不会重复推同一份文件。"});
+    else if(state.repo==="已提交") out.push({who:"版本",kind:"ai",model:"版控",text:"这一轮已经推过。没有新的资产差异，不重复提交。"});
+    else out.push({who:"版本",kind:"ai",model:"版控",think:"签认已过。真正写入仓库发生在提交页。",text:"可以去提交页。我只推 assets 里的美术和音效，说明由你来写。"});
   }
-  if(hit("记录员")) out.push({who:"记录员",kind:"ai",model:"静默",text:"简报：Wool 源码树已导入。S096 只覆盖钩爪和跳跃。签认前没有提交。"});
-  if(!out.length) out.push({who:"PM",kind:"ai",model:"分派",text:"用 @美术、@场景、@版本、@记录员 或 @PM 点名。Wool 的主场景路径我不会改。"});
+  if(hit("记录员")) out.push({who:"记录员",kind:"ai",model:"静默",text:"简报：多人在房间里并行看图和核验。签认前没有推送。记录员不接执行任务。"});
+  if(!out.length) out.push({who:"PM",kind:"ai",model:"分派",text:"用 @美术、@场景、@版本、@记录员 或 @PM 点名。每个人只做自己那一段。"});
   return out;
 }
 function sendRoom(){
@@ -542,7 +547,9 @@ function sendRoom(){
 }
 function viewRoom(){
   const me=CREW.find(c=>c.name===state.focus)||CREW[5];
-  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">联机房间</h1><p class="lead">真人与 Agent 看同一份 Wool 源码。出图和读关卡并行，签认和提交串行。</p></div>
+  const art=(state.repoInfo.art||[])[0];
+  const preview=art?`<img class="sprite" alt="${esc(art)}" src="/assets/art/${encodeURIComponent(art)}?v=${state.assetVer||0}">`:`<p class="note">还没有候选图。美术 Agent 只在这里讨论，上传去美术资产。</p>`;
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">联机房间</h1><p class="lead">真人和 Agent 在同一间。出图和核验并行，签认和推送串行。</p></div>
     <div class="btnrow"><button class="ghost" id="think">${state.thinkOn?"收起思考":"观察思考"}</button><button class="ghost" id="tocrew">成员与模型</button></div></div>
     <div class="room">
       <div class="card roster" style="padding:8px">
@@ -558,11 +565,11 @@ function viewRoom(){
         <p class="note">当前焦点 ${esc(me.name)}：${esc(me.duty)}</p>
       </div>
       <div class="card" style="padding:12px">
-        <b>Wool · 当前皮肤</b>
-        <div class="preview" style="margin:10px 0;min-height:160px;background:#1c2434">${woolStage()}</div>
-        <div class="kv"><span>脚本</span><b>wool.gd</b><span>钩爪</span><b>grappling_feature.gd</b><span>签认</span><b>${state.signed?"已签认":"未签认"}</b><span>仓库</span><b>${esc(state.repo)}</b></div>
-        <div class="btnrow" style="margin-top:10px"><button class="pri" id="sign">${state.signed?"已签认":"真人签认"}</button><button class="ghost" id="askrepo">让版本提交</button></div>
-        <p class="note">共同审阅在这里完成。版本 Agent 看见签认之后，才把差量写入存档仓库。</p>
+        <b>本轮候选</b>
+        <div class="preview" style="margin:10px 0;min-height:160px">${preview}</div>
+        <div class="kv"><span>美术</span><b>${(state.repoInfo.art||[]).length} 个</b><span>音效</span><b>${(state.repoInfo.audio||[]).length} 个</b><span>签认</span><b>${state.signed?"已签认":"未签认"}</b><span>仓库</span><b>${esc(state.repo)}</b></div>
+        <div class="btnrow" style="margin-top:10px"><button class="pri" id="sign">${state.signed?"已签认":"真人签认"}</button><button class="ghost" id="askrepo">${state.signed?"去提交":"让版本提交"}</button></div>
+        <p class="note">共同审阅在这里完成。版本 Agent 看见签认之后，才允许把资产推到仓库。</p>
       </div>
     </div>`;
 }
@@ -575,14 +582,13 @@ function viewCrew(){
 }
 function viewBoard(){
   const rows=[
-    ["assets/character/wool/jump.png","美术","已核对","对应 wool.gd 里不循环的 jump"],
-    ["assets/character/eagle/fly.png","美术","已隔离","不套到 Wool"],
-    ["scenes/levels/level_1.tscn","场景","已核对","仍是 project.godot 的主场景"],
+    ["assets/art","美术","候选","只出图，不自己入库"],
+    ["assets/audio","场景","并行核验","可以和出图同时进行"],
     ["用户签认","制作人",state.signed?"已签认":"待签认","执行者不能自己闭环"],
-    ["audio_manager.gd","记录员","可写入","hook-2.wav 尚未登记"],
-    ["存档提交","版本",state.repo,"只收本卡列出的文件"]
+    ["待推送",(state.repoInfo.pending||[]).length+" 个文件","版本",state.repo],
+    ["仓库","版本",state.connected?"已连接":"未连接","nancywu5-hk/AI-game--explore"]
   ];
-  return `<h1 class="h1">交接与版本</h1><p class="lead">S096 上的交接。多人同时看 Wool 的文件，版本只收已签认的差量。</p>
+  return `<h1 class="h1">交接与版本</h1><p class="lead">多人同时看同一批资产。版本只收已签认的差量，再推到仓库。</p>
     <div class="card" style="padding:8px 12px"><table class="table"><tr><th>事项</th><th>负责人</th><th>状态</th><th>备注</th></tr>
       ${rows.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td><td><span class="pill ${r[2]==="待签认"||r[2]==="等待签认"?"wait":"ok"}">${esc(r[2])}</span></td><td class="meta">${esc(r[3])}</td></tr>`).join("")}
     </table></div>
@@ -625,12 +631,16 @@ function bind(){
     if(t.id==="sign"){
       if(state.signed){toast("这张卡已经签认");return}
       state.signed=true;
-      state.msgs.push({who:"制作人",kind:"human",text:"S096 用户签认。版本 Agent 只提交 wool.gd、grappling_feature.gd、jump.png 和 level_1.tscn。"});
-      logs.unshift("真人签认 S096 · Wool");
+      state.repo="可以提交";
+      state.msgs.push({who:"制作人",kind:"human",text:"本轮签认。版本 Agent 只推 assets 里的美术和音效。"});
+      logs.unshift("真人签认 · 版本 Agent 可以提交");
       toast("已签认，版本 Agent 可以提交");
       render();
     }
-    if(t.id==="askrepo"){state.draft="@版本 提交本轮已签认的差量";sendRoom()}
+    if(t.id==="askrepo"){
+      if(!state.signed){state.draft="@版本 提交本轮已签认的资产";sendRoom();return}
+      state.view="commit";render();loadRepo();
+    }
     if(t.dataset.upload){chooseUpload(t.dataset.upload,"")}
     if(t.dataset.replace){chooseUpload(t.dataset.kind,t.dataset.replace)}
     if(t.dataset.file!=null&&t.dataset.kind){
