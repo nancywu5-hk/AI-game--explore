@@ -375,3 +375,4 @@
 代码资产｜按新切图改帧矩形｜code/whitebox｜project.godot｜已提交｜-｜只动脚本和场景结构。
 代码资产｜搭白模地面｜code/whitebox｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜小精灵用黄块占位｜code/whitebox｜scripts/features/grappling_feature.gd｜已提交｜-｜只动脚本和场景结构。
+代码资产｜跳跃先接上｜code/whitebox｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
