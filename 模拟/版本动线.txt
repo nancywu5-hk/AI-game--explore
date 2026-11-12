@@ -727,3 +727,4 @@
 合并｜解冲突后合并进主线｜main｜project.godot｜已解决｜-｜冲突已经人工选边，主线只留一份。
 代码资产｜搭白模地面｜code/play｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/blockout｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜跳跃先接上｜code/play｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
