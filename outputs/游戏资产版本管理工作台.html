@@ -192,6 +192,9 @@ const NAV=[
   {g:"资产",items:[
     ["library","全部资产"]
   ]},
+  {g:"预览",items:[
+    ["play","运行游戏"]
+  ]},
   {g:"仓库",items:[
     ["commit","提交"]
   ]}
@@ -316,14 +319,14 @@ const CREW=[
   {name:"制作人",kind:"人",st:"在线",dot:"live",duty:"房主。验收、退回、签认。",model:"—",wake:"—"},
   {name:"美术复核",kind:"人",st:"在线",dot:"live",duty:"看候选图，提出修改。不直接入库。",model:"—",wake:"—"},
   {name:"程序复核",kind:"人",st:"在线",dot:"live",duty:"看白模、脚本和差异。",model:"—",wake:"—"},
-  {name:"记录员",kind:"Agent",st:"静默",dot:"",duty:"只整理纪要和待办，不接执行任务。",model:"记录模型",wake:"静默"},
-  {name:"PM",kind:"Agent",st:"分派",dot:"busy",duty:"判断交给谁，钉住里程碑。不改仓库。",model:"分派模型",wake:"@唤起 · 新消息 · 每 15 分钟"},
-  {name:"美术",kind:"Agent",st:"出图",dot:"busy",duty:"只产候选。不装入正式目录，不写玩法代码。",model:"出图模型",wake:"仅 @唤起"},
-  {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"核验模型",wake:"仅 @唤起"},
-  {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"版控模型",wake:"仅 @唤起"}
+  {name:"记录员",kind:"Agent",st:"静默",dot:"",duty:"只整理纪要和待办，不接执行任务。",model:"DeepSeek-V4-Flash-Online-32k",wake:"静默 · 纪要"},
+  {name:"PM",kind:"Agent",st:"分派",dot:"busy",duty:"判断交给谁，钉住里程碑。不改仓库。",model:"GLM-5_3-Online-128k",wake:"@唤起 · 新消息 · 每 15 分钟"},
+  {name:"美术",kind:"Agent",st:"出图",dot:"busy",duty:"只产候选。不装入正式目录，不写玩法代码。",model:"hy4",wake:"仅 @唤起"},
+  {name:"场景",kind:"Agent",st:"核验",dot:"live",duty:"核对白模、碰撞和正反例。",model:"hy3",wake:"仅 @唤起"},
+  {name:"版本",kind:"Agent",st:"版控",dot:"live",duty:"真人签认后才提交。未改文件不重复提交，不自行开分支。",model:"hy4",wake:"仅 @唤起"}
 ];
 const state={view:"pipes",uiPick:0,sceneFile:0,libFilter:"全部",libQ:"",libPick:"",files:[],replacePath:"",tab:"当前",q:"",fst:"全部",role:0,scene:0,dir:"idle",playing:true,skinId:"wool",woolFrame:0,acc:0,skinMsg:"",quest:2,qtab:"现行",bookQ:"",bookD:"全部",dom:0,diff:false,phase:-1,audio:0,aud:false,logOn:false,connected:false,repoInfo:{art:[],audio:[],pending:[],sha:"",branch:"main",remote:REPO_URL},pickArt:0,pickAudio:0,uploadKind:"art",replaceName:"",commitUrl:"",commitErr:"",
-  signed:false,artVer:2,repo:"等待签认",thinkOn:false,draft:"",waiting:false,focus:"美术",
+  signed:false,artVer:2,repo:"等待签认",thinkOn:true,draft:"",waiting:false,waitingWho:"",focus:"美术",agentMeta:null,testStatus:"",
   msgs:[
     {who:"制作人",kind:"human",text:"@PM 这轮只替换美术和音效。美术和场景可以同时看，版本 Agent 在我签认前不要提交。"},
     {who:"PM",kind:"ai",model:"分派",think:"出图和核验可以并行。写入 GitHub 必须等人签认。",text:"已钉住这轮。@美术 只在房间里给出候选，不自己入库。@场景 核对这批资源能不能放进关卡。@版本 签认前不要推仓库。"},
@@ -337,7 +340,7 @@ function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");se
 function esc(s){return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
 function nav(){
   $("#nav").innerHTML=NAV.map(g=>`<div class="nav-g">${g.g}</div>`+g.items.map(([id,name])=>`<button data-v="${id}" class="${state.view===id?"on":""}">${name}</button>`).join("")).join("");
-  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;const next=b.dataset.v;const enter=next!==state.view;state.view=next;render();if(["room","art","audio","commit","board","library"].includes(state.view))loadRepo();if(enter&&state.view==="library")loadLibrary()};
+  $("#nav").onclick=e=>{const b=e.target.closest("button");if(!b)return;const next=b.dataset.v;const enter=next!==state.view;state.view=next;render();if(["room","art","audio","commit","board","library"].includes(state.view))loadRepo();if(enter&&state.view==="library")loadLibrary();if(state.view==="play")loadPlay()};
 }
 function steps(names,on=0){
   return `<div class="steps">${names.map((n,i)=>`<div class="step ${i===on?"on":""}"><b>0${i+1}</b>${n}</div>`).join("")}</div>`;
@@ -354,8 +357,8 @@ function woolStage(){
   const spec=FRAMES[clipOf(state.dir)];
   return `<div class="stage"><canvas class="woolc" width="256" height="256"></canvas></div><div class="meta" id="frameno" style="text-align:center;margin-top:6px">${(state.woolFrame%spec.frames.length)+1} / ${spec.frames.length} · ${esc(currentSkin().name)}</div>`;
 }
-function assetUrl(rel){return "/games/Wool/"+rel}
-function thumbUrl(rel){return "/api/thumb?path="+encodeURIComponent("games/Wool/"+rel)}
+function assetUrl(rel){return "/games/Wool-main/"+rel}
+function thumbUrl(rel){return "/api/thumb?path="+encodeURIComponent("games/Wool-main/"+rel)}
 function shot(rel,alt){return `<img class="sprite" alt="${esc(alt||"")}" src="${thumbUrl(rel)}">`}
 function sprite(role,anim){
   const file=(role.sheet&&role.sheet[anim])||Object.values(role.sheet||{})[0];
@@ -401,7 +404,7 @@ function viewSprint(){
 function viewPipes(){
   const block=(title,lead,items)=>`<div class="card" style="padding:12px"><div class="meta">${title}</div><h2 style="margin:4px 0 10px">${lead}</h2>${items}</div>`;
   const row=(go,idx,img,name,meta)=>`<button class="item" data-go="${go}" data-idx="${idx}" style="width:100%;text-align:left;display:flex;gap:10px;align-items:center"><img alt="" src="${thumbUrl(img)}" style="width:72px;height:72px;object-fit:contain;background:#1c2434;border-radius:10px"><span><b>${esc(name)}</b><div class="meta">${esc(meta)}</div></span></button>`;
-  return `<h1 class="h1">资产管线</h1><p class="lead">按角色、场景、界面三条管线管控。每条都能预览、走制作步骤、过四道闸门，再替换对应文件。</p>
+  return `<h1 class="h1">资产管线</h1><p class="lead">资产目录 games/Wool-main/assets。按角色、场景、界面三条管线管控。每条都能预览、走制作步骤、过四道闸门，再替换对应文件。</p>
     <div class="split3">
       ${block("01 角色", "羊毛人、鸟、鱼", ROLES.map((r,i)=>row("role",i,r.sheet[r.anims[0]],r.name,r.kind+" · "+r.anims.join(" / "))).join(""))}
       ${block("02 场景", "背景、铆钉", SCENES.map((s,i)=>row("scene",i,s.files[0],s.name,s.files.length+" 个文件")).join(""))}
@@ -416,7 +419,7 @@ function viewRole(){
   return `<div class="split"><div class="card list" style="padding:8px">${ROLES.map((x,i)=>`<button class="item ${i===state.role?"on":""}" data-r="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${esc(x.kind)}</div></button>`).join("")}</div>
     <div><div class="card" style="padding:14px"><div class="row"><div class="grow"><div class="preview">${shot(file,r.name)}</div>
       <div class="play"><select id="dir">${r.anims.map(d=>`<option ${anim===d?"selected":""}>${d}</option>`).join("")}</select>
-        <button class="pri" id="replacegame" data-target="games/Wool/${file}">替换这张表</button></div></div>
+        <button class="pri" id="replacegame" data-target="games/Wool-main/${file}">替换这张表</button></div></div>
       <div style="flex:1 1 240px;max-width:340px"><div class="kv"><span>角色</span><b>${esc(r.name)}</b><span>场景</span><b>${esc(r.rev)}</b><span>脚本</span><b>${esc(r.script)}</b><span>当前表</span><b>${esc(file)}</b></div>
       <p class="meta" style="margin-top:8px">音效 ${r.sounds.map(s=>esc(s.split("/").pop())).join(" · ")}</p></div></div>
       <h4>制作步骤</h4>${steps(names,2)}
@@ -429,7 +432,7 @@ function viewScene(){
   const names=["功能与走查","白模定标","目标帧","四向细化","逐区与校验","图层与状态","照相机与结尾"];
   return `<div class="split"><div class="card list" style="padding:8px">${SCENES.map((x,i)=>`<button class="item ${i===state.scene?"on":""}" data-s="${i}" style="width:100%;text-align:left"><b>${esc(x.name)}</b><div class="meta">${x.files.length} 个文件</div></button>`).join("")}</div>
     <div class="card" style="padding:14px"><div class="row"><div class="preview grow">${shot(file,s.name)}</div>
-      <div style="flex:1 1 240px"><b>${esc(s.name)}</b><p class="note">${esc(s.note)}</p><p class="meta">${esc(file)}</p><button class="pri" id="replacegame" data-target="games/Wool/${file}">替换这张图</button></div></div>
+      <div style="flex:1 1 240px"><b>${esc(s.name)}</b><p class="note">${esc(s.note)}</p><p class="meta">${esc(file)}</p><button class="pri" id="replacegame" data-target="games/Wool-main/${file}">替换这张图</button></div></div>
       <div class="agrid" style="margin-top:10px">${s.files.map((f,i)=>`<button class="acard ${f===file?"on":""}" data-sfile="${i}"><img alt="" src="${thumbUrl(f)}"><b>${esc(f.split("/").pop())}</b></button>`).join("")}</div>
       <h4>制作步骤</h4>${steps(names,1)}
       <h4>本轮验收</h4>${gates()}
@@ -440,7 +443,7 @@ function viewUI(){
   return `<div class="split"><div class="card list" style="padding:8px">${UIASSETS.map((c,i)=>`<button class="item ${i===state.uiPick?"on":""}" data-ui="${i}" style="width:100%;text-align:left"><b>${esc(c.name)}</b><div class="meta">${esc(c.file)}</div></button>`).join("")}</div>
     <div class="card" style="padding:14px"><div class="preview">${shot(cur.file,cur.name)}</div>
       <p class="meta">${esc(cur.file)}</p>
-      <button class="pri" id="replacegame" data-target="games/Wool/${cur.file}">替换这个按钮</button>
+      <button class="pri" id="replacegame" data-target="games/Wool-main/${cur.file}">替换这个按钮</button>
       <h4>制作步骤</h4>${steps(["宿主与语义","原生采样","组件与数据","源卡与画板","主题接入","尺寸与交互","视觉与确认"],0)}
       <h4>本轮核验</h4>${gates()}
     </div></div>`;
@@ -452,7 +455,7 @@ function viewAudio(){
     <div class="card" style="padding:14px"><div class="row"><div class="preview grow"><div style="text-align:center"><div style="font-size:28px;color:var(--accent)">♪</div><b>${esc(c.name)}</b><audio id="clip" src="${GAME.src}${c.file}"></audio><div class="play"><div class="bar"><i class="${state.aud?"run":""}"></i></div><button class="ghost" id="aud">${state.aud?"暂停":"试听"}</button></div></div></div>
       <div style="flex:1 1 220px;max-width:300px" class="kv"><span>键</span><b>${esc(c.name)}</b><span>文件</span><b>${esc(c.file)}</b><span>登记处</span><b>audio_manager.gd</b><span>许可</span><b>MIT</b></div></div>
       <h4>制作步骤</h4>${steps(["用途与事实","谱与许可","构造与曲库","处理与 QC","cue 与混音","真实宿主","听审与交付"],0)}
-      <p>键名来自 AudioManager 的常量表。试听播放的是 games/Wool 里的文件。hook-2.wav 在磁盘上，但还没有写进 _sound_files。</p>
+      <p>键名来自 AudioManager 的常量表。试听播放的是 games/Wool-main 里的文件。hook-2.wav 在磁盘上，但还没有写进 _sound_files。</p>
       <h4>本轮核验</h4>${gates()}</div></div>`;
 }
 function viewQuest(){
@@ -474,7 +477,7 @@ function viewInv(old){
   return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">${old?"未登记的文件":"当前资源盘点"}</h1><p class="lead">${old?"hook-2.wav 在磁盘上，但 audio_manager.gd 的 _sound_files 还没有这个键。":"按 Wool 仓库里的文件点名。文件在，不等于这张卡已经验收。"}</p></div><button class="pri" id="ref">刷新</button></div>
     <p>${old?"未登记音效 1 · hook-2.wav":"GDScript 65 · 场景 28 · PNG 44 · 音效 14"}</p>
     <div class="card" style="padding:8px 12px">${invTable(old)}</div>
-    <p class="note">${old?"这行只标记未登记，不作为放行依据。":"绿条表示 games/Wool 里有对应文件。营销片和安装包没有放进这棵树。"}</p>`;
+    <p class="note">${old?"这行只标记未登记，不作为放行依据。":"绿条表示 games/Wool-main 里有对应文件。营销片和安装包没有放进这棵树。"}</p>`;
 }
 function viewBook(){
   const rows=BOOKS.filter(b=>(state.bookD==="全部"||b[1].includes(state.bookD))&&b.join(" ").includes(state.bookQ));
@@ -520,6 +523,7 @@ function assetView(kind){
 function sizeOf(n){if(n>1048576)return (n/1048576).toFixed(1)+" MB";if(n>1024)return Math.round(n/1024)+" KB";return n+" B"}
 function viewLibrary(){
   const groups=["全部","角色","地图","界面","图标","音效","字体","其他"];
+  const count=g=>g==="全部"?(state.files||[]).length:(state.files||[]).filter(f=>f.group===g).length;
   const q=(state.libQ||"").trim();
   const files=(state.files||[]).filter(f=>(state.libFilter==="全部"||f.group===state.libFilter)&&(!q||(f.name+f.path).includes(q)));
   const cur=files.find(f=>f.path===state.libPick)||files[0];
@@ -528,75 +532,120 @@ function viewLibrary(){
     :cur.kind==="audio"
     ?`<div style="text-align:center"><div style="font-size:28px;color:var(--accent)">♪</div><b>${esc(cur.name)}</b><audio id="clip" src="/${cur.path}?v=${state.assetVer||0}"></audio></div>`
     :`<b>${esc(cur.name)}</b>`;
-  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">游戏资产</h1><p class="lead">这里是游戏里现有的图、声音和字体。点开一个，再替换，路径保持不变。</p></div></div>
-    <div class="tabs">${groups.map(g=>`<button data-filter="${g}" class="${state.libFilter===g?"on":""}">${g}</button>`).join("")}</div>
-    <div class="search"><input id="libq" placeholder="按文件名或路径找" value="${esc(state.libQ)}"></div>
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">游戏资产</h1><p class="lead">这里是游戏里现有的图、声音和字体。用分类下拉只看角色、地图或图标，点开一个再替换，路径保持不变。</p></div></div>
+    <div class="search"><select id="libfilter" aria-label="资产分类">${groups.map(g=>`<option value="${g}" ${state.libFilter===g?"selected":""}>${g} · ${count(g)}</option>`).join("")}</select><input id="libq" placeholder="按文件名或路径找" value="${esc(state.libQ)}"></div>
     <div class="split"><div><div class="agrid">${files.map(f=>`<button class="acard ${cur&&cur.path===f.path?"on":""}" data-lib="${esc(f.path)}">${f.kind==="image"?`<img alt="" src="/api/thumb?path=${encodeURIComponent(f.path)}">`:`<div class="ph">${f.kind==="audio"?"♪":"字"}</div>`}<b>${esc(f.name)}</b><div class="meta">${esc(f.group)} · ${sizeOf(f.bytes)}</div></button>`).join("")||`<p class="note">没有匹配的资产。</p>`}</div></div>
     <div class="card" style="padding:14px">${cur?`<div class="preview">${preview}</div><p style="margin-top:10px"><b>${esc(cur.name)}</b></p><p class="meta">${esc(cur.path)}<br>${sizeOf(cur.bytes)}</p><div class="btnrow"><button class="pri" id="replacegame">替换这个文件</button>${cur.kind==="audio"?`<button class="ghost" id="aud">${state.aud?"暂停":"试听"}</button>`:""}</div><p class="note">替换后仍是这个路径。到提交页才会推进仓库。</p>`:`<p class="note">先从左边选一个资产。</p>`}</div></div>`;
 }
 function viewArt(){return assetView("art")}
 function viewAudio(){return assetView("audio")}
+function fileBrief(files){
+  const list=files||[];
+  const shown=list.slice(0,6).map(f=>`${esc(f.status)} ${esc(f.path)}`).join("<br>");
+  const more=list.length>6?`<div class="meta">还有 ${list.length-6} 个文件</div>`:"";
+  return shown?shown+more:"—";
+}
 function viewCommit(){
   const info=state.repoInfo;
-  const pending=info.pending||[];
+  const changes=info.changes||(info.pending||[]).map(p=>({status:"改动",path:p,code:""}));
+  const commits=info.commits||[];
   const names=["暂存资产","创建提交","推送到仓库"];
-  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">提交</h1><p class="lead">这一步连接 <a href="${REPO_URL}">nancywu5-hk/AI-game--explore</a>。只提交 assets 里的美术和音效。</p></div><button class="ghost" id="refreshc">刷新</button></div>
-    <div class="stats"><div class="stat"><div class="n">${state.connected?esc(info.branch||"main"):"—"}</div><div class="l">分支</div></div><div class="stat"><div class="n">${state.connected?esc(info.sha||"—"):"—"}</div><div class="l">当前版本</div></div><div class="stat"><div class="n">${pending.length}</div><div class="l">待提交文件</div></div></div>
-    <div class="card" style="padding:12px"><b>将要提交</b>
-      ${pending.length?`<ul>${pending.map(p=>`<li>${esc(p)}</li>`).join("")}</ul>`:`<p class="note">没有未提交的美术或音效。先在资产页上传。</p>`}
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">提交</h1><p class="lead">改动和已提交记录都列在这里。提交会推到 <a href="${REPO_URL}">nancywu5-hk/AI-game--explore</a> 的 ${esc(info.branch||"main")}。</p></div><button class="ghost" id="refreshc">刷新</button></div>
+    <div class="stats"><div class="stat"><div class="n">${state.connected?esc(info.sha||"—"):"—"}</div><div class="l">当前版本</div><div class="s">${state.connected?esc(info.branch||"main"):"未连接"}</div></div><div class="stat"><div class="n">${changes.length}</div><div class="l">未提交改动</div></div><div class="stat"><div class="n">${commits.length}</div><div class="l">最近提交</div></div></div>
+    <div class="card" style="padding:8px 12px"><b>未提交的改动</b>
+      ${changes.length?`<table class="table"><tr><th>状态</th><th>文件</th></tr>${changes.map(c=>`<tr><td><span class="pill ${c.code==="D"?"back":"wait"}">${esc(c.status)}</span></td><td>${esc(c.path)}</td></tr>`).join("")}</table>`:`<p class="note">没有未提交的文件。先在资产页替换，再回到这里写说明。</p>`}
     </div>
-    <div class="card sec" style="padding:12px"><h4>提交说明</h4><textarea id="msg" placeholder="例如：替换主界面背景，并更新点击音效"></textarea>
+    <div class="card sec" style="padding:12px"><h4>这次要提交的说明</h4><textarea id="msg" placeholder="例如：替换羊毛人待机图，并更新按钮"></textarea>
       <div class="btnrow" style="margin-top:8px"><button class="pri" id="doCommit">提交到仓库</button></div>
       <div class="prog4">${names.map((_,i)=>`<div class="${state.phase>i?"done":state.phase===i?"run":""}"></div>`).join("")}</div>
       <div class="meta">${names.map((n,i)=>`${i+1}. ${n}`).join(" · ")} ${state.phase>=3?"· 已推送":state.phase>=0?"· 正在提交":""}</div>
-      ${state.commitUrl?`<p class="note">已写入仓库：<a href="${esc(state.commitUrl)}">${esc(state.commitUrl)}</a></p>`:""}
+      ${state.commitUrl?`<p class="note">这次提交：<a href="${esc(state.commitUrl)}">${esc(state.commitUrl)}</a></p>`:""}
       ${state.commitErr?`<p class="note">${esc(state.commitErr)}</p>`:""}
+    </div>
+    <div class="card sec" style="padding:8px 12px"><b>已经提交的记录</b>
+      ${commits.length?`<table class="table"><tr><th>时间</th><th>说明</th><th>版本</th><th>涉及文件</th></tr>${commits.map(c=>`<tr><td>${esc(c.date)}</td><td>${esc(c.message)}</td><td><a href="${esc(c.url)}">${esc(c.sha)}</a></td><td>${fileBrief(c.files)}</td></tr>`).join("")}</table>`:`<p class="note">还没有读到提交记录。</p>`}
     </div>`;
 }
-function replyTo(text){
-  const hit=name=>text.includes("@"+name);
-  const out=[];
-  if(hit("PM")) out.push({who:"PM",kind:"ai",model:"分派",think:"出图和核验并行，签认和推送串行。",text:"美术和场景可以同时做。版本 Agent 在签认前不推 https://github.com/nancywu5-hk/AI-game--explore 。"});
-  if(hit("美术")){state.artVer++;out.push({who:"美术",kind:"ai",model:"出图",think:"我只给候选，不自己按提交。",text:"候选仍停在房间。要换文件，去美术资产上传，上传不等于入库。",artifact:"候选图"});}
-  if(hit("场景")) out.push({who:"场景",kind:"ai",model:"核验",think:"我核对资源能不能进关卡，不写仓库。",text:"这批美术和音效可以同时核。命名和时长对上之前，不建议签认。"});
-  if(hit("版本")){
-    if(!state.signed) out.push({who:"版本",kind:"ai",model:"版控",think:"闸门未过。现在推送会把未签认的资产写进仓库。",text:"先不提交。还差制作人签认。我不会自己开分支，也不会重复推同一份文件。"});
-    else if(state.repo==="已提交") out.push({who:"版本",kind:"ai",model:"版控",text:"这一轮已经推过。没有新的资产差异，不重复提交。"});
-    else out.push({who:"版本",kind:"ai",model:"版控",think:"签认已过。真正写入仓库发生在提交页。",text:"可以去提交页。我只推 assets 里的美术和音效，说明由你来写。"});
-  }
-  if(hit("记录员")) out.push({who:"记录员",kind:"ai",model:"静默",text:"简报：多人在房间里并行看图和核验。签认前没有推送。记录员不接执行任务。"});
-  if(!out.length) out.push({who:"PM",kind:"ai",model:"分派",text:"用 @美术、@场景、@版本、@记录员 或 @PM 点名。每个人只做自己那一段。"});
-  return out;
+function viewPlay(){
+  const p=state.playInfo||{};
+  const log=(p.log||"").trim();
+  const phase=p.phase||(p.running?"running":"idle");
+  const label=phase==="importing"?"正在导入资源":phase==="running"?"运行中":phase==="failed"?"没有跑起来":"未运行";
+  return `<h1 class="h1">运行游戏</h1><p class="lead">在这台电脑上用 Godot 打开 games/Wool-main，从第一关把整局跑起来。</p>
+    <div class="stats"><div class="stat"><div class="n">${p.godot?"已安装":"未找到"}</div><div class="l">Godot ${esc(p.version||"")}</div></div><div class="stat"><div class="n">${label}</div><div class="l">${p.pid?"进程 "+p.pid:"游戏窗口"}</div></div><div class="stat"><div class="n">空格</div><div class="l">跳跃，也可以点击</div></div></div>
+    <div class="btnrow"><button class="pri" id="runGame">${phase==="importing"?"正在导入，请稍等":phase==="running"?"游戏已在运行":"在本地运行整个游戏"}</button>${phase==="running"?`<button class="ghost" id="stopGame">停止</button>`:""}</div>
+    <p class="note">项目 ${esc(p.project||"games/Wool-main")}，主场景 ${esc(p.scene||"scenes/levels/level_1.tscn")}。窗口 1280×720。第一次会先把贴图和声音导入，导入完成后再打开游戏窗口。</p>
+    ${p.error?`<p class="note">${esc(p.error)}</p>`:""}
+    ${log?`<pre class="card sec" style="padding:12px;white-space:pre-wrap;max-height:280px;overflow:auto">${esc(log)}</pre>`:""}`;
 }
-function sendRoom(){
+async function sendRoom(){
   const text=(state.draft||"").trim();
   if(!text){toast("先写一句，或用 @点名");return}
-  if(state.waiting){toast("上一条还在思考");return}
+  if(state.waiting){toast("Agent 正在调用大模型生成思考与回复…");return}
   state.msgs.push({who:"制作人",kind:"human",text});
   state.draft="";
-  const replies=replyTo(text);
+
+  const whoList=[];
+  if(text.includes("@PM")) whoList.push("PM");
+  if(text.includes("@美术")) whoList.push("美术");
+  if(text.includes("@场景")) whoList.push("场景");
+  if(text.includes("@版本")) whoList.push("版本");
+  if(text.includes("@记录员")) whoList.push("记录员");
+  if(!whoList.length) whoList.push("PM");
+
   state.waiting=true;
+  state.waitingWho=whoList.join("、");
   render();
-  setTimeout(()=>{state.msgs.push(...replies);state.waiting=false;render();},700);
+
+  try{
+    const promises=whoList.map(async who=>{
+      const r=await fetch("/api/agent/chat",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({who,text,history:state.msgs.slice(-6),signed:state.signed})
+      });
+      return await r.json();
+    });
+    const results=await Promise.all(promises);
+    results.forEach(res=>{
+      if(!res) return;
+      const isArt=res.who==="美术"&&((res.text||"").includes("候选")||(res.text||"").includes("图"));
+      state.msgs.push({
+        who:res.who,
+        kind:"ai",
+        model:res.model,
+        think:res.think||(res.ok?"深度思考已完成":"大模型调用异常"),
+        text:res.text,
+        artifact:isArt?"候选图":undefined
+      });
+      if(res.who==="美术") state.artVer++;
+    });
+  }catch(err){
+    state.msgs.push({who:"系统",kind:"ai",model:"异常",text:"大模型请求未完成："+err.message,think:"请检查本地工作台服务连接"});
+  }finally{
+    state.waiting=false;
+    state.waitingWho="";
+    render();
+  }
 }
 function viewRoom(){
   const me=CREW.find(c=>c.name===state.focus)||CREW[5];
   const art=(state.repoInfo.art||[])[0];
   const preview=art?`<img class="sprite" alt="${esc(art)}" src="/assets/art/${encodeURIComponent(art)}?v=${state.assetVer||0}">`:`<p class="note">还没有候选图。美术 Agent 只在这里讨论，上传去美术资产。</p>`;
-  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">联机房间</h1><p class="lead">真人和 Agent 在同一间。出图和核验并行，签认和推送串行。</p></div>
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">联机房间</h1><p class="lead">真人和 Agent 在同一间。出图和核验并行，签认和推送串行。5 个 Agent 均已由后台真实大模型驱动。</p></div>
     <div class="btnrow"><button class="ghost" id="think">${state.thinkOn?"收起思考":"观察思考"}</button><button class="ghost" id="tocrew">成员与模型</button></div></div>
     <div class="room">
       <div class="card roster" style="padding:8px">
         <div class="meta" style="padding:6px 8px">房间里的人</div>
         ${CREW.filter(c=>c.kind==="人").map(c=>`<button class="member ${state.focus===c.name?"on":""}" data-who="${c.name}"><i class="dot ${c.dot}"></i><span><b>${c.name}</b><div class="meta">${c.st}</div></span></button>`).join("")}
-        <div class="meta" style="padding:8px 8px 4px">Agent</div>
+        <div class="meta" style="padding:8px 8px 4px">大模型 Agent</div>
         ${CREW.filter(c=>c.kind==="Agent").map(c=>`<button class="member ${state.focus===c.name?"on":""}" data-who="${c.name}"><i class="dot ${c.dot}"></i><span><b>${c.name}</b><div class="meta">${c.st} · ${c.model}</div></span></button>`).join("")}
       </div>
       <div class="card" style="padding:12px">
         <div class="thread">${state.msgs.map(m=>`<div class="bubble ${m.kind}"><div class="who">${esc(m.who)}${m.model?" · "+esc(m.model):""}</div><div>${esc(m.text)}</div>${m.artifact?`<div class="meta">产物 ${esc(m.artifact)} · 未入库</div>`:""}${state.thinkOn&&m.think?`<div class="think">${esc(m.think)}</div>`:""}</div>`).join("")}
-        ${state.waiting?`<div class="meta">思考中… 每个 Agent 有自己的思考空间</div>`:""}</div>
-        <div class="say"><input id="say" placeholder="用 @美术 @场景 @版本 @记录员 @PM 点名" value="${esc(state.draft)}"><button class="pri" id="send">发送</button></div>
-        <p class="note">当前焦点 ${esc(me.name)}：${esc(me.duty)}</p>
+        ${state.waiting?`<div class="meta" style="padding:8px;background:var(--accent-soft);border-radius:8px">思考中… @${esc(state.waitingWho)} 正在通过后台大模型生成思考链与回答…</div>`:""}</div>
+        <div class="say"><input id="say" placeholder="用 @美术 @场景 @版本 @记录员 @PM 点名，回车即调用大模型" value="${esc(state.draft)}"><button class="pri" id="send">${state.waiting?"思考中":"发送"}</button></div>
+        <p class="note">当前焦点 ${esc(me.name)}：${esc(me.duty)}（大模型：${esc(me.model||"—")}）</p>
       </div>
       <div class="card" style="padding:12px">
         <b>本轮候选</b>
@@ -608,11 +657,26 @@ function viewRoom(){
     </div>`;
 }
 function viewCrew(){
-  return `<h1 class="h1">成员与模型</h1><p class="lead">人和 Agent 都在房间里。Agent 分工不同，唤起方式不同。静默的记录员不接执行任务。</p>
-    <div class="card" style="padding:8px 12px"><table class="table"><tr><th>成员</th><th>身份</th><th>模型 / 状态</th><th>唤起</th><th>职责边界</th></tr>
-      ${CREW.map(c=>`<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.kind)}</td><td>${esc(c.model)}<div class="meta">${esc(c.st)}</div></td><td>${esc(c.wake)}</td><td>${esc(c.duty)}</td></tr>`).join("")}
+  const models=["hy3","hy4","DeepSeek-V4-Flash-Online-32k","GLM-5_3-Online-128k"];
+  return `<div class="row" style="justify-content:space-between"><div><h1 class="h1">成员与大模型配置</h1><p class="lead">记录员、PM、美术、场景、版本管理 5 个 Agent 均已接入大模型 API。支持按角色切换模型。</p></div><div class="btnrow"><button class="pri" id="testLLM">测试模型连通性</button></div></div>
+    <div class="stats" style="margin-bottom:14px">
+      <div class="stat"><div class="n" style="font-size:20px;color:var(--ok)">已授权</div><div class="l">API Key</div><div class="s">021bab4e...5c34</div></div>
+      <div class="stat"><div class="n" style="font-size:20px">URL 1</div><div class="l">http://api.taiji.woa.com/openapi/v2</div><div class="s">模型：hy3, hy4</div></div>
+      <div class="stat"><div class="n" style="font-size:20px">URL 2</div><div class="l">http://api.taiji.woa.com/openapi</div><div class="s">模型：DeepSeek-V4-Flash, GLM-5_3</div></div>
+      <div class="stat"><div class="n" style="font-size:20px">${state.testStatus||"就绪"}</div><div class="l">健康状态</div><div class="s">点击右上角测试</div></div>
+    </div>
+    <div class="card" style="padding:8px 12px"><table class="table"><tr><th>成员</th><th>身份</th><th>绑定的大模型 (可切换)</th><th>API 端点</th><th>唤起方式</th><th>职责边界与设定</th></tr>
+      ${CREW.map(c=>{
+        if(c.kind!=="Agent") return `<tr><td><b>${esc(c.name)}</b></td><td>${esc(c.kind)}</td><td>—</td><td>—</td><td>${esc(c.wake)}</td><td>${esc(c.duty)}</td></tr>`;
+        const endpoint = (c.model==="hy3"||c.model==="hy4") ? "openapi/v2" : "openapi";
+        return `<tr><td><b>${esc(c.name)}</b></td><td><span class="pill ok">${esc(c.kind)}</span></td><td>
+          <select data-agent-model="${esc(c.name)}" style="padding:4px 8px;border-radius:6px;border:1px solid var(--line);background:var(--bg)">
+            ${models.map(m=>`<option value="${m}" ${c.model===m?"selected":""}>${m}</option>`).join("")}
+          </select>
+        </td><td><span class="meta">${endpoint}</span></td><td>${esc(c.wake)}</td><td>${esc(c.duty)}</td></tr>`;
+      }).join("")}
     </table></div>
-    <p class="note">常用角色可以预置，但每个角色的仓库权限仍是最小权限。版本 Agent 不能绕过签认。</p>`;
+    <p class="note">每个 Agent 拥有独立的思考空间（包含思维链）。在联机房间输入消息时，点名对应 Agent 会实时触发大模型调用；点击「观察思考」可展开模型原生 reasoning_content。</p>`;
 }
 function viewBoard(){
   const rows=[
@@ -632,7 +696,7 @@ function viewBoard(){
       <div class="stat"><b>串行集成</b><p class="meta">签认、入库、提交按闸门来。没过线的候选停在房间里。</p></div>
     </div>`;
 }
-const views={pipes:viewPipes,library:viewLibrary,art:viewArt,audio:viewAudio,skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit};
+const views={pipes:viewPipes,library:viewLibrary,art:viewArt,audio:viewAudio,skin:viewSkin,room:viewRoom,crew:viewCrew,board:viewBoard,sprint:viewSprint,role:viewRole,scene:viewScene,ui:viewUI,quest:viewQuest,inv:()=>viewInv(false),invold:()=>viewInv(true),book:viewBook,struct:viewStruct,sum:viewSum,commit:viewCommit,play:viewPlay};
 function bind(){
   const v=$("#view");
   v.onclick=e=>{
@@ -666,7 +730,7 @@ function bind(){
     if(t.id==="ref"){toast("已按单一数据源重新盘点")}
     if(t.id==="lockd"){toast("已定位领域与上下游，未改文件")}
     if(t.id==="seediff"){state.diff=!state.diff;render()}
-    if(t.id==="refreshc"){toast("提交卡已刷新");logs.unshift("刷新提交卡")}
+    if(t.id==="refreshc"){loadRepo();toast("提交记录已刷新")}
     if(t.id==="recheck"){state.phase=-1;toast("闸门已重跑");render()}
     const whoBtn=t.closest&&t.closest("[data-who]");
     if(whoBtn){state.focus=whoBtn.dataset.who;render()}
@@ -699,11 +763,19 @@ function bind(){
       render();
     }
     if(t.id==="doCommit"){submitRepo()}
+    if(t.id==="runGame"){startGame()}
+    if(t.id==="stopGame"){stopGame()}
+    if(t.id==="testLLM"){testAllModels()}
+  };
+  v.onchange=e=>{
+    const sel=e.target.closest&&e.target.closest("select[data-agent-model]");
+    if(sel){updateAgentModel(sel.dataset.agentModel, sel.value)}
   };
   const sq=$("#sq"); if(sq) sq.oninput=e=>{state.q=e.target.value;render();$("#sq").focus()};
   const sf=$("#sf"); if(sf) sf.onchange=e=>{state.fst=e.target.value;render()};
   const dir=$("#dir"); if(dir) dir.onchange=e=>{state.dir=e.target.value;state.woolFrame=0;state.acc=0;render()};
   const lq=$("#libq"); if(lq) lq.oninput=e=>{state.libQ=e.target.value;render();const n=$("#libq");if(n){n.focus();n.setSelectionRange(n.value.length,n.value.length)}};
+  const lf=$("#libfilter"); if(lf) lf.onchange=e=>{state.libFilter=e.target.value;render()};
   const bq=$("#bq"); if(bq) bq.oninput=e=>{state.bookQ=e.target.value;render();$("#bq").focus()};
   const bd=$("#bd"); if(bd) bd.onchange=e=>{state.bookD=e.target.value;render()};
   const say=$("#say");
@@ -741,6 +813,41 @@ function replaceGame(path){
   const input=$("#upfile");
   input.accept="."+ext;
   input.click();
+}
+async function loadPlay(){
+  try{
+    const r=await fetch("/api/play");
+    const data=await r.json();
+    state.playInfo=data;
+    state.playInfo.error=data.ok===false?data.error:"";
+  }catch(err){
+    state.playInfo={running:false,godot:false,error:"工作台服务没有连上"};
+  }
+  if(state.view==="play") render();
+  if((state.playInfo||{}).phase==="importing") setTimeout(loadPlay,3000);
+}
+async function startGame(){
+  try{
+    const r=await fetch("/api/play?action=start",{method:"POST"});
+    const data=await r.json();
+    state.playInfo=data;
+    state.playInfo.error=data.ok===false?(data.error||"没有启动"):"";
+    toast(data.running?"游戏窗口正在打开":(data.error||"没有启动"));
+  }catch(err){
+    toast("没有启动游戏");
+  }
+  render();
+  setTimeout(loadPlay,2500);
+}
+async function stopGame(){
+  try{
+    const r=await fetch("/api/play?action=stop",{method:"POST"});
+    state.playInfo=await r.json();
+    toast("已停止游戏");
+  }catch(err){
+    toast("没有停掉游戏");
+  }
+  render();
 }
 async function loadLibrary(){
   try{
@@ -792,11 +899,11 @@ async function applySkin(){
   try{
     const r=await fetch("/api/skin",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:skin.id,name:skin.name,tint:skin.tint})});
     if(!r.ok) throw new Error("http");
-    state.skinMsg="已写入 games/Wool/resources/skins/active_skin.json，并同步 wool_skin.tres。下次运行 Wool，角色和镐子会染成"+skin.name+"。";
+    state.skinMsg="已写入 games/Wool-main/resources/skins/active_skin.json，并同步 wool_skin.tres。下次运行 Wool，角色和镐子会染成"+skin.name+"。";
     toast("皮肤已写入 Wool");
     logs.unshift("换皮肤 "+skin.name+" "+skin.tint);
   }catch(err){
-    state.skinMsg="预览已换成"+skin.name+"。当前页面没有连上工作台服务，游戏文件还没改。请用 games/Wool/tools/workbench_server.py 打开后再点一次。";
+    state.skinMsg="预览已换成"+skin.name+"。当前页面没有连上工作台服务，游戏文件还没改。请用 games/Wool-main/tools/workbench_server.py 打开后再点一次。";
     toast("预览已换色，游戏文件未写入");
   }
   render();
@@ -825,9 +932,67 @@ $("#upfile").onchange=async e=>{
     toast(err.message||"上传没有完成");
   }
 };
+async function loadAgentModels(){
+  try{
+    const r=await fetch("/api/agent/models");
+    const data=await r.json();
+    if(data.ok&&data.agents){
+      state.agentMeta=data;
+      CREW.forEach(c=>{
+        if(data.agents[c.name]) c.model=data.agents[c.name].model;
+      });
+      if(state.view==="crew"||state.view==="room") render();
+    }
+  }catch(e){}
+}
+async function updateAgentModel(who, model){
+  try{
+    const r=await fetch("/api/agent/config",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({who,model})
+    });
+    const d=await r.json();
+    if(d.ok){
+      const c=CREW.find(x=>x.name===who);
+      if(c) c.model=model;
+      toast(`已将 ${who} 切换为 ${model}`);
+      logs.unshift(`大模型配置 · ${who} -> ${model}`);
+      render();
+    }else{
+      toast("切换失败："+d.error);
+    }
+  }catch(err){
+    toast("切换失败："+err.message);
+  }
+}
+async function testAllModels(){
+  state.testStatus="测试中…";
+  render();
+  try{
+    const r=await fetch("/api/agent/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({who:"PM",text:"测试连通性，请做15字以内的简短答复"})
+    });
+    const d=await r.json();
+    if(d.ok){
+      state.testStatus="正常 (通过)";
+      toast("大模型 API 连通正常！");
+    }else{
+      state.testStatus="异常";
+      toast("测试失败："+(d.error||"未知"));
+    }
+  }catch(err){
+    state.testStatus="异常";
+    toast("连接异常："+err.message);
+  }
+  render();
+}
 render();
 loadRepo();
 loadLibrary();
+loadAgentModels();
 </script>
 </body>
 </html>
