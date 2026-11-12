@@ -866,3 +866,4 @@
 美术资产｜用行走表替换黄块｜art/blockout｜assets/map/nails/boost-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜脱落铆钉用红圈｜code/play｜scenes/characters/players/wool.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜老鹰按距离出生｜code/play｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
+美术资产｜启动画面接入｜art/blockout｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
