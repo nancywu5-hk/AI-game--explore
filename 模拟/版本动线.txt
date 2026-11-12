@@ -987,3 +987,4 @@
 代码资产｜加速铆钉用黄圈｜code/play｜scenes/levels/level_1.tscn｜已提交｜-｜只动脚本和场景结构。
 合并｜合并时发现同一文件被两边改过｜main｜scenes/characters/players/wool.tscn｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
 美术资产｜启动画面接入｜art/blockout｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜保留白模启动参数｜code/play｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
