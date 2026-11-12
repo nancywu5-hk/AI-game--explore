@@ -747,3 +747,4 @@
 代码资产｜老鹰按距离出生｜code/play｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜保留白模启动参数｜code/play｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/blockout｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜搭白模地面｜code/play｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
