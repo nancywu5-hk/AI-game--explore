@@ -928,3 +928,4 @@
 代码资产｜跳跃先接上｜code/play｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/blockout｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜合并时发现同一文件被两边改过｜main｜scripts/levels/enemy_spawner.gd｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
+代码资产｜普通铆钉用橙圈｜code/play｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
