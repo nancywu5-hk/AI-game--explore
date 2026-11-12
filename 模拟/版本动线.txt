@@ -1055,3 +1055,4 @@
 代码资产｜老鹰按距离出生｜code/play｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 合并｜合并为 白模玩法版｜main｜scenes/levels/level_1.tscn｜已合并｜白模玩法版｜障碍以色块进关卡，钩爪和三类铆钉可以玩。
 美术资产｜老鹰飞行表接入｜art/final｜assets/character/spucki/pflanze.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜搭白模地面｜code/integrate｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
