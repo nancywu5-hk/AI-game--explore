@@ -814,3 +814,4 @@
 合并｜合并时发现同一文件被两边改过｜main｜scenes/characters/enemies/plant.tscn｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
 代码资产｜按新切图改帧矩形｜code/play｜project.godot｜已提交｜-｜只动脚本和场景结构。
 美术资产｜用行走表替换黄块｜art/blockout｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜小精灵用黄块占位｜code/play｜scripts/features/grappling_feature.gd｜已提交｜-｜只动脚本和场景结构。
