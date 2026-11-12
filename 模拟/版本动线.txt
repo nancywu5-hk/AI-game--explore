@@ -996,3 +996,4 @@
 美术资产｜用行走表替换黄块｜art/blockout｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜普通铆钉用橙圈｜code/play｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜加速铆钉用黄圈｜code/play｜scenes/levels/level_1.tscn｜已提交｜-｜只动脚本和场景结构。
+美术资产｜启动画面接入｜art/blockout｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
