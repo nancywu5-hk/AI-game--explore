@@ -1278,3 +1278,4 @@
 合并｜合并时发现同一文件被两边改过｜main｜scripts/characters/wool.gd｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
 美术资产｜启动画面接入｜art/final｜assets/character/wool/jump.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜界面按钮接入｜art/final｜assets/character/eagle/fly.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜相机跟着方块走｜code/integrate｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
