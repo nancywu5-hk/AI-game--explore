@@ -1363,3 +1363,4 @@
 美术资产｜铆钉正面切图｜art/final｜assets/ui/button.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜花苞喷吐表｜art/final｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜解冲突后合并进主线｜main｜project.godot｜已解决｜-｜冲突已经人工选边，主线只留一份。
+美术资产｜用行走表替换黄块｜art/final｜assets/sound/wool/hook.wav｜已提交｜-｜只动美术文件，不改玩法脚本。
