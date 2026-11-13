@@ -1276,3 +1276,4 @@
 美术资产｜用行走表替换黄块｜art/final｜assets/sound/wool/hook.wav｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜老鹰飞行表接入｜art/final｜assets/character/wool/walk.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜合并时发现同一文件被两边改过｜main｜scripts/characters/wool.gd｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
+美术资产｜启动画面接入｜art/final｜assets/character/wool/jump.png｜已提交｜-｜只动美术文件，不改玩法脚本。
