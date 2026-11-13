@@ -1253,3 +1253,4 @@
 美术资产｜铆钉正面切图｜art/final｜assets/map/background.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜花苞喷吐表｜art/final｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜按新切图改帧矩形｜code/integrate｜project.godot｜已提交｜-｜只动脚本和场景结构。
+美术资产｜用行走表替换黄块｜art/final｜assets/map/nails/boost-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
