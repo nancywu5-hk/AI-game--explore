@@ -1355,3 +1355,4 @@
 代码资产｜搭白模地面｜code/integrate｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜用行走表替换黄块｜art/final｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜老鹰飞行表接入｜art/final｜assets/character/spucki/pflanze.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜相机跟着方块走｜code/integrate｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
