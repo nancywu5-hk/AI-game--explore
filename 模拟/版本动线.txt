@@ -1264,3 +1264,4 @@
 美术资产｜花苞喷吐表｜art/final｜assets/character/wool/jump.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜保留白模启动参数｜code/integrate｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
 美术资产｜用行走表替换黄块｜art/final｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+美术资产｜老鹰飞行表接入｜art/final｜assets/character/spucki/pflanze.png｜已提交｜-｜只动美术文件，不改玩法脚本。
