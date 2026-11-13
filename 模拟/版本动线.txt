@@ -1148,3 +1148,4 @@
 代码资产｜跳跃先接上｜code/integrate｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/final｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜界面按钮接入｜art/final｜assets/map/nails/normal-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜普通铆钉用橙圈｜code/integrate｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
