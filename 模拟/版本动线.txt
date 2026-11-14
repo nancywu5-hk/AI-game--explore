@@ -1658,3 +1658,4 @@
 合并｜合并美术分支和代码分支时卡住｜main｜scenes/levels/level_1.tscn｜冲突未解｜-｜代码给白模加了障碍节点，美术同时改了这张关卡的贴图引用。
 美术资产｜启动画面接入｜art/final｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜界面按钮接入｜art/final｜assets/map/nails/normal-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜保留白模启动参数｜code/integrate｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
