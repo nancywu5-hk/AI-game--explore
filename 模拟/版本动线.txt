@@ -1656,3 +1656,4 @@
 美术资产｜用行走表替换黄块｜art/final｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜老鹰飞行表接入｜art/final｜assets/character/spucki/pflanze.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜合并美术分支和代码分支时卡住｜main｜scenes/levels/level_1.tscn｜冲突未解｜-｜代码给白模加了障碍节点，美术同时改了这张关卡的贴图引用。
+美术资产｜启动画面接入｜art/final｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
