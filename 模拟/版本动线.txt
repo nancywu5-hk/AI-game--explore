@@ -1601,3 +1601,4 @@
 代码资产｜钩爪可以甩到铆钉｜code/integrate｜scripts/levels/enemy_spawner.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜小精灵比例草图，先不进主线｜art/final｜assets/map/nails/rusty-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜铆钉正面切图｜art/final｜assets/ui/button.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+美术资产｜花苞喷吐表｜art/final｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
