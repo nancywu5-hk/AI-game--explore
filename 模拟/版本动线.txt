@@ -1735,3 +1735,4 @@
 合并｜合并美术分支和代码分支时卡住｜main｜scenes/characters/players/wool.tscn｜冲突未解｜-｜行走帧矩形和 walk.png 的 8×2 切格不一致，合并停住。
 美术资产｜用行走表替换黄块｜art/final｜assets/map/nails/boost-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜老鹰飞行表接入｜art/final｜assets/map/nails/rusty-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜保留白模启动参数｜code/integrate｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
