@@ -2088,3 +2088,4 @@
 代码资产｜脱落铆钉用红圈｜code/integrate｜scenes/characters/players/wool.tscn｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/final｜assets/character/wool/jump.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜合并时发现同一文件被两边改过｜main｜assets/character/eagle/fly.png｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
+代码资产｜按新切图改帧矩形｜code/integrate｜project.godot｜已提交｜-｜只动脚本和场景结构。
