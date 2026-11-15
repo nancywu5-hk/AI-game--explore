@@ -2127,3 +2127,4 @@
 代码资产｜跳跃先接上｜code/integrate｜scripts/globals/whitebox.gd｜已提交｜-｜只动脚本和场景结构。
 代码资产｜相机跟着方块走｜code/integrate｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/final｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+美术资产｜界面按钮接入｜art/final｜assets/startbild.png｜已提交｜-｜只动美术文件，不改玩法脚本。
