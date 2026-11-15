@@ -2005,3 +2005,4 @@
 代码资产｜小精灵用黄块占位｜code/integrate｜scripts/features/grappling_feature.gd｜已提交｜-｜只动脚本和场景结构。
 美术资产｜用行走表替换黄块｜art/final｜assets/map/nails/boost-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜相机跟着方块走｜code/integrate｜scripts/world/level_generator.gd｜已提交｜-｜只动脚本和场景结构。
+合并｜合并美术分支和代码分支时卡住｜main｜scenes/characters/enemies/plant.tscn｜冲突未解｜-｜喷吐 49 帧和代码里的 3 段动画名对不上。
