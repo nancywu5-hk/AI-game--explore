@@ -1868,3 +1868,4 @@
 代码资产｜脱落铆钉用红圈｜code/integrate｜scenes/characters/players/wool.tscn｜已提交｜-｜只动脚本和场景结构。
 美术资产｜启动画面接入｜art/final｜assets/map/platform.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 美术资产｜界面按钮接入｜art/final｜assets/map/nails/normal-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
+代码资产｜按新切图改帧矩形｜code/integrate｜project.godot｜已提交｜-｜只动脚本和场景结构。
