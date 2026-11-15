@@ -1827,3 +1827,4 @@
 美术资产｜老鹰飞行表接入｜art/final｜assets/map/nails/rusty-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜搭白模地面｜code/integrate｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
 合并｜解冲突后合并进主线｜main｜assets/ui/warning.png｜已解决｜-｜冲突已经人工选边，主线只留一份。
+美术资产｜界面按钮接入｜art/final｜assets/startbild.png｜已提交｜-｜只动美术文件，不改玩法脚本。
