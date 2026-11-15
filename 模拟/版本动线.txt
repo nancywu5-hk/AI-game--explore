@@ -1886,3 +1886,4 @@
 美术资产｜用行走表替换黄块｜art/final｜assets/map/nails/boost-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜解冲突后合并进主线｜main｜assets/map/nails/rusty-front.png｜已解决｜-｜冲突已经人工选边，主线只留一份。
 代码资产｜普通铆钉用橙圈｜code/integrate｜scripts/levels/level_1.gd｜已提交｜-｜只动脚本和场景结构。
+美术资产｜启动画面接入｜art/final｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
