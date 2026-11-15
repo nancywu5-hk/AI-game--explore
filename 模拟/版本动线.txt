@@ -2144,3 +2144,4 @@
 代码资产｜老鹰按距离出生｜code/integrate｜scenes/interactions/nail.tscn｜已提交｜-｜只动脚本和场景结构。
 代码资产｜保留白模启动参数｜code/integrate｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
 合并｜合并美术分支和代码分支时卡住｜main｜scenes/characters/enemies/fish.tscn｜冲突未解｜-｜刺猬动画只要 12 帧，精灵表按 16 格提交，合并丢掉了 4 格。
+代码资产｜搭白模地面｜code/integrate｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
