@@ -1945,3 +1945,4 @@
 合并｜解冲突后合并进主线｜main｜scenes/characters/players/wool.tscn｜已解决｜-｜冲突已经人工选边，主线只留一份。
 美术资产｜用行走表替换黄块｜art/final｜assets/map/nails/boost-front.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜保留白模启动参数｜code/integrate｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
+代码资产｜按新切图改帧矩形｜code/integrate｜project.godot｜已提交｜-｜只动脚本和场景结构。
