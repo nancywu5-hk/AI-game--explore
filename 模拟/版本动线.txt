@@ -1799,3 +1799,4 @@
 美术资产｜启动画面接入｜art/final｜assets/ui/warning.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜合并时发现同一文件被两边改过｜main｜assets/startbild.png｜冲突未解｜-｜同一路径两边都改了，还没有人选边。
 代码资产｜加速铆钉用黄圈｜code/integrate｜scenes/levels/level_1.tscn｜已提交｜-｜只动脚本和场景结构。
+美术资产｜小精灵比例草图，先不进主线｜art/final｜assets/character/wool/walk.png｜已提交｜-｜只动美术文件，不改玩法脚本。
