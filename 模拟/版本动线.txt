@@ -2046,3 +2046,4 @@
 美术资产｜用行走表替换黄块｜art/final｜assets/character/fish/fish.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 代码资产｜按新切图改帧矩形｜code/integrate｜project.godot｜已提交｜-｜只动脚本和场景结构。
 代码资产｜搭白模地面｜code/integrate｜scripts/characters/wool.gd｜已提交｜-｜只动脚本和场景结构。
+合并｜合并美术分支和代码分支时卡住｜main｜scenes/interactions/rusty_nail.tscn｜冲突未解｜-｜脱落贴图和正面贴图互相覆盖，不知道留哪一张。
