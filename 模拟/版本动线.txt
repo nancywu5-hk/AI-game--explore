@@ -2132,3 +2132,4 @@
 美术资产｜小精灵比例草图，先不进主线｜art/final｜assets/character/wool/walk.png｜已提交｜-｜只动美术文件，不改玩法脚本。
 合并｜合并美术分支和代码分支时卡住｜main｜scripts/features/grappling_feature.gd｜冲突未解｜-｜挥钩帧数和绳长动画不同步。
 代码资产｜保留白模启动参数｜code/integrate｜scenes/characters/enemies/plant.tscn｜已提交｜-｜只动脚本和场景结构。
+代码资产｜按新切图改帧矩形｜code/integrate｜project.godot｜已提交｜-｜只动脚本和场景结构。
